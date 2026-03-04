@@ -1,0 +1,115 @@
+import { Deck } from "@/types/slides";
+
+export const HARDCODED_DECK: Deck = {
+  id: "deck-001",
+  title: "Campfire Demo",
+  slides: [
+    {
+      id: "slide-001",
+      background: { type: "color", value: "#1a1a2e" },
+      notes: "",
+      elements: [
+        {
+          id: "el-001-title",
+          type: "text",
+          rect: { x: 160, y: 280, width: 1600, height: 220 },
+          zIndex: 1,
+          content: "Welcome to Campfire",
+          style: {
+            fontFamily: "Inter, sans-serif",
+            fontSize: 96,
+            fontWeight: 700,
+            fontStyle: "normal",
+            color: "#ffffff",
+            textAlign: "center",
+            lineHeight: 1.2,
+            letterSpacing: -2,
+          },
+        },
+        {
+          id: "el-001-subtitle",
+          type: "text",
+          rect: { x: 360, y: 530, width: 1200, height: 100 },
+          zIndex: 2,
+          content: "A WYSIWYG editor for reveal.js presentations",
+          style: {
+            fontFamily: "Inter, sans-serif",
+            fontSize: 36,
+            fontWeight: 400,
+            fontStyle: "normal",
+            color: "#a0a0c0",
+            textAlign: "center",
+            lineHeight: 1.5,
+            letterSpacing: 0,
+          },
+        },
+      ],
+    },
+    {
+      id: "slide-002",
+      background: { type: "color", value: "#0f3460" },
+      notes: "",
+      elements: [
+        {
+          id: "el-002-heading",
+          type: "text",
+          rect: { x: 160, y: 180, width: 1400, height: 160 },
+          zIndex: 1,
+          content: "Built for Creators",
+          style: {
+            fontFamily: "Inter, sans-serif",
+            fontSize: 80,
+            fontWeight: 700,
+            fontStyle: "normal",
+            color: "#ffffff",
+            textAlign: "left",
+            lineHeight: 1.2,
+            letterSpacing: -1,
+          },
+        },
+        {
+          id: "el-002-body",
+          type: "text",
+          rect: { x: 160, y: 400, width: 1200, height: 300 },
+          zIndex: 2,
+          content:
+            "Drag, drop, and edit your slides visually.\nNo code required.",
+          style: {
+            fontFamily: "Inter, sans-serif",
+            fontSize: 48,
+            fontWeight: 400,
+            fontStyle: "normal",
+            color: "#e0e0ff",
+            textAlign: "left",
+            lineHeight: 1.6,
+            letterSpacing: 0,
+          },
+        },
+      ],
+    },
+    {
+      id: "slide-003",
+      background: { type: "color", value: "#16213e" },
+      notes: "",
+      elements: [
+        {
+          id: "el-003-cta",
+          type: "text",
+          rect: { x: 160, y: 380, width: 1600, height: 200 },
+          zIndex: 1,
+          content: "Start presenting today.",
+          style: {
+            fontFamily: "Inter, sans-serif",
+            fontSize: 88,
+            fontWeight: 700,
+            fontStyle: "normal",
+            color: "#f97316",
+            textAlign: "center",
+            lineHeight: 1.2,
+            letterSpacing: -2,
+          },
+        },
+      ],
+    },
+  ],
+};
