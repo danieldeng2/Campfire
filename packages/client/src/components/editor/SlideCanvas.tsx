@@ -23,9 +23,8 @@ const DEFAULT_TEXT_STYLE: TextStyle = {
 const MIN_DRAW_SIZE = 20;
 
 export function SlideCanvas() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { scale, canvasWidth, canvasHeight } = useCanvasScale(containerRef);
+  const { scale, canvasWidth, canvasHeight, containerRef } = useCanvasScale();
 
   const { activeSlideId, activeTool, selectElement, setEditingElement, setActiveTool } =
     useEditorStore();
