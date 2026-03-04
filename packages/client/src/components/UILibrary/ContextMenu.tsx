@@ -46,6 +46,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
         zIndex: 1000,
         minWidth: 140,
       }}
+      onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
       {items.map((item, i) => (
