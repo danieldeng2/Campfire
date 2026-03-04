@@ -36,6 +36,7 @@ export function PresentToolbar({ visible, current, total, onPrev, onNext }: Pres
 
   return (
     <div
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: "fixed",
         bottom: 32,

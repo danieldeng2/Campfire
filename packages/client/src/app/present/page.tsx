@@ -76,6 +76,7 @@ export default function PresentPage() {
     <div
       style={{ width: "100vw", height: "100vh", position: "relative" }}
       onMouseMove={handleMouseMove}
+      onClick={() => revealInstance.current?.next()}
     >
       <div className="reveal" ref={deckRef} style={{ width: "100vw", height: "100vh" }}>
         <div className="slides">
