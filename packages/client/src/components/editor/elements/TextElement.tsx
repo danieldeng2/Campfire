@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { TextElement as TextElementType } from "@/types/slides";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { useDragElement } from "@/hooks/useDragElement";
+import { c } from "@/lib/colors";
+import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 
 interface Props {
   element: TextElementType;
@@ -16,11 +19,14 @@ export function TextElement({ element, slideId, scale }: Props) {
   const { rect, style, content, id } = element;
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { selectedElementId, editingElementId, selectElement, setEditingElement } = useEditorStore();
-  const { updateElementRect, updateElementContent } = useSlidesStore();
+  const { selectedElementId, editingElementId, selectElement, setEditingElement } =
+    useEditorStore();
+  const { updateElementRect, updateElementContent, deleteElement } = useSlidesStore();
 
   const isSelected = selectedElementId === id;
   const isEditing = editingElementId === id;
+
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
 
   // Sync content into DOM when not editing
   useEffect(() => {
@@ -62,6 +68,16 @@ export function TextElement({ element, slideId, scale }: Props) {
     [id, selectElement, setEditingElement]
   );
 
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      selectElement(id);
+      setCtxMenu({ x: e.clientX, y: e.clientY });
+    },
+    [id, selectElement]
+  );
+
   const handleBlur = useCallback(() => {
     if (contentRef.current) {
       updateElementContent(slideId, id, contentRef.current.textContent ?? "");
@@ -69,14 +85,11 @@ export function TextElement({ element, slideId, scale }: Props) {
     setEditingElement(null);
   }, [slideId, id, updateElementContent, setEditingElement]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        contentRef.current?.blur();
-      }
-    },
-    []
-  );
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      contentRef.current?.blur();
+    }
+  }, []);
 
   const handleDragEnd = useCallback(
     (newRect: typeof rect) => {
@@ -102,13 +115,14 @@ export function TextElement({ element, slideId, scale }: Props) {
         height: rect.height,
         zIndex: element.zIndex,
         cursor: isEditing ? "text" : isSelected ? "move" : "default",
-        outline: isSelected ? "2px solid #3b82f6" : "2px solid transparent",
+        outline: isSelected ? `2px solid ${c.brand}` : "2px solid transparent",
         outlineOffset: "2px",
         userSelect: isEditing ? "text" : "none",
         borderRadius: 2,
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
+      onContextMenu={handleContextMenu}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -137,6 +151,25 @@ export function TextElement({ element, slideId, scale }: Props) {
           overflow: "hidden",
         }}
       />
+
+      {ctxMenu && (
+        <ContextMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          onClose={() => setCtxMenu(null)}
+          items={[
+            {
+              label: "Delete",
+              icon: <Trash2 size={13} />,
+              danger: true,
+              onClick: () => {
+                deleteElement(slideId, id);
+                selectElement(null);
+              },
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }

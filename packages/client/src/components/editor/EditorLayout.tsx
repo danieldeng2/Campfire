@@ -3,18 +3,31 @@
 import { useEffect } from "react";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
+import { Tool } from "@/types/editor";
+import { c } from "@/lib/colors";
 import { TopNav } from "./TopNav";
 import { Sidebar } from "./Sidebar";
 import { SlideCanvas } from "./SlideCanvas";
+import { ToolBar } from "./ToolBar";
 
 export function EditorLayout() {
   const slides = useSlidesStore((s) => s.deck.slides);
-  const { activeSlideId, editingElementId, setActiveSlide } = useEditorStore();
+  const { activeSlideId, editingElementId, setActiveSlide, setActiveTool } = useEditorStore();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't navigate while typing in a text element
+      // Don't handle shortcuts while typing in a text element
       if (editingElementId) return;
+
+      if (e.key === "v" || e.key === "V") {
+        setActiveTool(Tool.Move);
+        return;
+      }
+      if (e.key === "t" || e.key === "T") {
+        setActiveTool(Tool.Text);
+        return;
+      }
+
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
 
       const currentIndex = slides.findIndex((s) => s.id === activeSlideId);
@@ -32,18 +45,22 @@ export function EditorLayout() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [slides, activeSlideId, editingElementId, setActiveSlide]);
+  }, [slides, activeSlideId, editingElementId, setActiveSlide, setActiveTool]);
 
   return (
     <div
       className="flex flex-col h-screen overflow-hidden"
-      style={{ background: "#f0f0f0", color: "#111" }}
+      style={{ background: c.canvas, color: c.ink }}
     >
       <TopNav />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex flex-1 items-center justify-center overflow-hidden p-8">
+        <main
+          className="flex flex-1 items-center justify-center overflow-hidden p-8"
+          style={{ position: "relative" }}
+        >
           <SlideCanvas />
+          <ToolBar />
         </main>
       </div>
     </div>

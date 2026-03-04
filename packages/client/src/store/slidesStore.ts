@@ -1,13 +1,18 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { Deck, SlideRect } from "@/types/slides";
+import type { Deck, SlideElement, SlideRect } from "@/types/slides";
 import { HARDCODED_DECK } from "@/lib/hardcodedDeck";
 
 interface SlidesState {
   deck: Deck;
   updateElementRect: (slideId: string, elementId: string, rect: SlideRect) => void;
   updateElementContent: (slideId: string, elementId: string, content: string) => void;
+  updateTitle: (title: string) => void;
   addSlide: () => string; // returns the new slide's id
+  reorderSlide: (fromIndex: number, toIndex: number) => void;
+  deleteSlide: (slideId: string) => void;
+  addElement: (slideId: string, element: SlideElement) => void;
+  deleteElement: (slideId: string, elementId: string) => void;
 }
 
 export const useSlidesStore = create<SlidesState>()(
@@ -28,15 +33,42 @@ export const useSlidesStore = create<SlidesState>()(
         if (el && el.type === "text") el.content = content;
       }),
 
+    updateTitle: (title) =>
+      set((state) => {
+        state.deck.title = title;
+      }),
+
+    reorderSlide: (from, to) =>
+      set((state) => {
+        const [slide] = state.deck.slides.splice(from, 1);
+        state.deck.slides.splice(to, 0, slide);
+      }),
+
+    deleteSlide: (slideId) =>
+      set((state) => {
+        state.deck.slides = state.deck.slides.filter((s) => s.id !== slideId);
+      }),
+
+    addElement: (slideId, element) =>
+      set((state) => {
+        const slide = state.deck.slides.find((s) => s.id === slideId);
+        if (slide) slide.elements.push(element);
+      }),
+
+    deleteElement: (slideId, elementId) =>
+      set((state) => {
+        const slide = state.deck.slides.find((s) => s.id === slideId);
+        if (slide) slide.elements = slide.elements.filter((e) => e.id !== elementId);
+      }),
+
     addSlide: () => {
       const id = crypto.randomUUID();
       set((state) => {
-        state.deck.slides.push({
-          id,
-          background: { type: "color", value: "#ffffff" },
-          elements: [],
-          notes: "",
-        });
+        const lastSlide = state.deck.slides.at(-1);
+        const background = lastSlide
+          ? { ...lastSlide.background }
+          : { type: "color" as const, value: "#ffffff" };
+        state.deck.slides.push({ id, background, elements: [], notes: "" });
       });
       return id;
     },

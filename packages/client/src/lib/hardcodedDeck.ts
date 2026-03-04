@@ -72,8 +72,7 @@ export const HARDCODED_DECK: Deck = {
           type: "text",
           rect: { x: 160, y: 400, width: 1200, height: 300 },
           zIndex: 2,
-          content:
-            "Drag, drop, and edit your slides visually.\nNo code required.",
+          content: "Drag, drop, and edit your slides visually.\nNo code required.",
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 48,

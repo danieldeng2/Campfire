@@ -1,6 +1,7 @@
 "use client";
 
-import { Slide } from "@/types/slides";
+import type { Slide } from "@/types/slides";
+import { c, ink } from "@/lib/colors";
 
 const THUMBNAIL_WIDTH = 176;
 const CANVAS_WIDTH = 1920;
@@ -12,16 +13,56 @@ interface Props {
   slide: Slide;
   index: number;
   isActive: boolean;
+  isDragging?: boolean;
+  isDragOver?: boolean;
   onClick: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: (e: React.DragEvent) => void;
 }
 
-export function SlideThumbnail({ slide, index, isActive, onClick }: Props) {
+export function SlideThumbnail({
+  slide,
+  index,
+  isActive,
+  isDragging = false,
+  isDragOver = false,
+  onClick,
+  onContextMenu,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: Props) {
   return (
     <div
+      draggable={!!onDragStart}
       onClick={onClick}
+      onContextMenu={onContextMenu}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
       className="flex flex-col gap-1.5 cursor-pointer"
-      style={{ userSelect: "none" }}
+      style={{ userSelect: "none", opacity: isDragging ? 0.4 : 1, position: "relative" }}
     >
+      {/* Drop indicator */}
+      {isDragOver && (
+        <div
+          style={{
+            position: "absolute",
+            top: -10,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: c.brand,
+            borderRadius: 1,
+          }}
+        />
+      )}
+
       <div
         style={{
           width: THUMBNAIL_WIDTH,
@@ -29,7 +70,7 @@ export function SlideThumbnail({ slide, index, isActive, onClick }: Props) {
           position: "relative",
           overflow: "hidden",
           borderRadius: 4,
-          border: isActive ? "2px solid #3b82f6" : "2px solid rgba(0,0,0,0.12)",
+          border: isActive ? `2px solid ${c.brand}` : `2px solid ${ink(0.12)}`,
           transition: "border-color 0.15s",
           flexShrink: 0,
         }}
@@ -77,7 +118,7 @@ export function SlideThumbnail({ slide, index, isActive, onClick }: Props) {
       </div>
       <span
         className="text-xs text-center"
-        style={{ color: isActive ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.35)" }}
+        style={{ color: isActive ? c.brand : ink(0.35) }}
       >
         {index + 1}
       </span>
