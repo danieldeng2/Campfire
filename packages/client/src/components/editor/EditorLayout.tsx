@@ -12,7 +12,15 @@ import { ToolBar } from "./ToolBar";
 
 export function EditorLayout() {
   const slides = useSlidesStore((s) => s.deck.slides);
-  const { activeSlideId, editingElementId, setActiveSlide, setActiveTool } = useEditorStore();
+  const deleteElement = useSlidesStore((s) => s.deleteElement);
+  const {
+    activeSlideId,
+    editingElementId,
+    selectedElementIds,
+    selectElements,
+    setActiveSlide,
+    setActiveTool,
+  } = useEditorStore();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -25,6 +33,23 @@ export function EditorLayout() {
       }
       if (e.key === "t" || e.key === "T") {
         setActiveTool(Tool.Text);
+        return;
+      }
+
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedElementIds.length > 0) {
+        e.preventDefault();
+        if (!activeSlideId) return;
+        for (const id of selectedElementIds) {
+          deleteElement(activeSlideId, id);
+        }
+        selectElements([]);
+        return;
+      }
+
+      if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        const slide = slides.find((s) => s.id === activeSlideId);
+        if (slide) selectElements(slide.elements.map((el) => el.id));
         return;
       }
 
@@ -45,7 +70,16 @@ export function EditorLayout() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [slides, activeSlideId, editingElementId, setActiveSlide, setActiveTool]);
+  }, [
+    slides,
+    activeSlideId,
+    editingElementId,
+    selectedElementIds,
+    selectElements,
+    deleteElement,
+    setActiveSlide,
+    setActiveTool,
+  ]);
 
   return (
     <div

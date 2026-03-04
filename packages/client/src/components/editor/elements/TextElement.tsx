@@ -19,11 +19,11 @@ export function TextElement({ element, slideId, scale }: Props) {
   const { rect, style, content, id } = element;
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { selectedElementId, editingElementId, selectElement, setEditingElement } =
+  const { selectedElementIds, editingElementId, selectElements, setEditingElement } =
     useEditorStore();
   const { updateElementRect, updateElementContent, deleteElement } = useSlidesStore();
 
-  const isSelected = selectedElementId === id;
+  const isSelected = selectedElementIds.includes(id);
   const isEditing = editingElementId === id;
 
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
@@ -51,31 +51,31 @@ export function TextElement({ element, slideId, scale }: Props) {
     (e: React.MouseEvent) => {
       e.stopPropagation();
       if (!isSelected) {
-        selectElement(id);
+        selectElements([id]);
       } else if (!isEditing) {
         setEditingElement(id);
       }
     },
-    [isSelected, isEditing, id, selectElement, setEditingElement]
+    [isSelected, isEditing, id, selectElements, setEditingElement]
   );
 
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      selectElement(id);
+      selectElements([id]);
       setEditingElement(id);
     },
-    [id, selectElement, setEditingElement]
+    [id, selectElements, setEditingElement]
   );
 
   const handleContextMenu = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      selectElement(id);
+      selectElements([id]);
       setCtxMenu({ x: e.clientX, y: e.clientY });
     },
-    [id, selectElement]
+    [id, selectElements]
   );
 
   const handleBlur = useCallback(() => {
@@ -164,7 +164,7 @@ export function TextElement({ element, slideId, scale }: Props) {
               danger: true,
               onClick: () => {
                 deleteElement(slideId, id);
-                selectElement(null);
+                selectElements([]);
               },
             },
           ]}
