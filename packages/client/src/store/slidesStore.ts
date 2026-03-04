@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { Deck, SlideRect } from "@/types/slides";
+import type { Deck, SlideRect } from "@/types/slides";
 import { HARDCODED_DECK } from "@/lib/hardcodedDeck";
 
 interface SlidesState {
   deck: Deck;
   updateElementRect: (slideId: string, elementId: string, rect: SlideRect) => void;
   updateElementContent: (slideId: string, elementId: string, content: string) => void;
+  addSlide: () => string; // returns the new slide's id
 }
 
 export const useSlidesStore = create<SlidesState>()(
@@ -26,5 +27,18 @@ export const useSlidesStore = create<SlidesState>()(
         const el = slide?.elements.find((e) => e.id === elementId);
         if (el && el.type === "text") el.content = content;
       }),
+
+    addSlide: () => {
+      const id = crypto.randomUUID();
+      set((state) => {
+        state.deck.slides.push({
+          id,
+          background: { type: "color", value: "#ffffff" },
+          elements: [],
+          notes: "",
+        });
+      });
+      return id;
+    },
   }))
 );

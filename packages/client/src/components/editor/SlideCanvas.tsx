@@ -20,10 +20,7 @@ export function SlideCanvas() {
   const scaledHeight = canvasHeight * scale;
 
   return (
-    <div
-      ref={containerRef}
-      className="flex-1 flex items-center justify-center w-full h-full"
-    >
+    <div ref={containerRef} className="flex-1 flex items-center justify-center w-full h-full">
       {/* Outer wrapper: sized to scaled dimensions */}
       <div
         style={{
@@ -31,7 +28,7 @@ export function SlideCanvas() {
           height: scaledHeight,
           position: "relative",
           borderRadius: 6,
-          boxShadow: "0 8px 40px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)",
+          boxShadow: `0 8px 40px ${activeSlide.background.value}99, 0 2px 8px ${activeSlide.background.value}66`,
           overflow: "hidden",
         }}
         onClick={() => selectElement(null)}
@@ -52,12 +49,7 @@ export function SlideCanvas() {
           {activeSlide.elements.map((el) => {
             if (el.type === "text") {
               return (
-                <TextElement
-                  key={el.id}
-                  element={el}
-                  slideId={activeSlide.id}
-                  scale={scale}
-                />
+                <TextElement key={el.id} element={el} slideId={activeSlide.id} scale={scale} />
               );
             }
             return null;

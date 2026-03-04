@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useSlidesStore } from "@/store/slidesStore";
 import "reveal.js/dist/reveal.css";
 import "reveal.js/dist/theme/black.css";
@@ -10,9 +11,22 @@ export default function PresentPage() {
   const slides = useSlidesStore((s) => s.deck.slides);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const revealInstance = useRef<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     let destroyed = false;
+
+    // Request fullscreen on entry
+    document.documentElement.requestFullscreen?.().catch(() => {});
+
+    // Navigate back to editor whenever fullscreen is exited (covers both
+    // browser-native Escape and any programmatic exitFullscreen call)
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        router.push("/editor");
+      }
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     import("reveal.js").then(async ({ default: Reveal }) => {
       if (destroyed || !deckRef.current || revealInstance.current) return;
@@ -32,19 +46,17 @@ export default function PresentPage() {
 
     return () => {
       destroyed = true;
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.exitFullscreen?.().catch(() => {});
       if (revealInstance.current) {
         revealInstance.current.destroy?.();
         revealInstance.current = null;
       }
     };
-  }, []);
+  }, [router]);
 
   return (
-    <div
-      className="reveal"
-      ref={deckRef}
-      style={{ width: "100vw", height: "100vh" }}
-    >
+    <div className="reveal" ref={deckRef} style={{ width: "100vw", height: "100vh" }}>
       <div className="slides">
         {slides.map((slide) => (
           <section

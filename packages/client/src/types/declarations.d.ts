@@ -8,6 +8,7 @@ declare module "reveal.js" {
     width?: number;
     height?: number;
     margin?: number;
+    keyboard?: boolean | Record<number, (() => void) | null>;
   }
 
   class Reveal {
