@@ -6,7 +6,7 @@ export const HARDCODED_DECK: Deck = {
   slides: [
     {
       id: "slide-001",
-      background: { type: "color", value: "#1a1a2e" },
+      background: { type: "color", value: "#ffffff" },
       notes: "",
       elements: [
         {
@@ -20,7 +20,7 @@ export const HARDCODED_DECK: Deck = {
             fontSize: 96,
             fontWeight: 700,
             fontStyle: "normal",
-            color: "#ffffff",
+            color: "#111111",
             textAlign: "center",
             lineHeight: 1.2,
             letterSpacing: -2,
@@ -37,7 +37,7 @@ export const HARDCODED_DECK: Deck = {
             fontSize: 36,
             fontWeight: 400,
             fontStyle: "normal",
-            color: "#a0a0c0",
+            color: "rgba(0,0,0,0.45)",
             textAlign: "center",
             lineHeight: 1.5,
             letterSpacing: 0,
@@ -47,7 +47,7 @@ export const HARDCODED_DECK: Deck = {
     },
     {
       id: "slide-002",
-      background: { type: "color", value: "#0f3460" },
+      background: { type: "color", value: "#ffffff" },
       notes: "",
       elements: [
         {
@@ -61,7 +61,7 @@ export const HARDCODED_DECK: Deck = {
             fontSize: 80,
             fontWeight: 700,
             fontStyle: "normal",
-            color: "#ffffff",
+            color: "#111111",
             textAlign: "left",
             lineHeight: 1.2,
             letterSpacing: -1,
@@ -78,7 +78,7 @@ export const HARDCODED_DECK: Deck = {
             fontSize: 48,
             fontWeight: 400,
             fontStyle: "normal",
-            color: "#e0e0ff",
+            color: "rgba(0,0,0,0.6)",
             textAlign: "left",
             lineHeight: 1.6,
             letterSpacing: 0,
@@ -88,7 +88,7 @@ export const HARDCODED_DECK: Deck = {
     },
     {
       id: "slide-003",
-      background: { type: "color", value: "#16213e" },
+      background: { type: "color", value: "#ffffff" },
       notes: "",
       elements: [
         {

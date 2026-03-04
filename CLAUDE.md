@@ -17,6 +17,20 @@
 - **Frontend**: `packages/client` (`@campfire/client`). `pnpm dev` / `pnpm build` delegate to it via `--filter`.
 - **Shell**: prepend `source ~/.zprofile &&` to any `node`/`pnpm` commands — the shell PATH doesn't include `/opt/homebrew/bin` by default.
 
+## Colors
+
+- **All colors must use tokens** from `packages/client/src/lib/colors.ts`. Never hardcode hex or rgba values.
+- Use the `c` object for named tokens: `c.brand`, `c.surface`, `c.canvas`, `c.ink`, `c.danger`, `c.dangerBg`, `c.brandGhost`, `c.flameOuter`, `c.flameInner`.
+- Use the `ink(opacity)` helper for translucent black overlays, borders, and muted text (e.g. `ink(0.08)` for subtle borders, `ink(0.5)` for muted icons).
+- Colors are defined in React inline styles, not CSS or Tailwind utility classes.
+- `c.brand` (orange-500) is the single accent color — use it for active states, selections, and focus rings throughout the UI.
+
+## Icons
+
+- Use **lucide-react** for all icons. Never inline custom SVGs except for brand identity assets (`CampfireIcon`).
+- Import icons by name: `import { Trash2, Plus, Play } from "lucide-react"`.
+- `CampfireIcon` lives in `components/UILibrary/CampfireIcon.tsx` and is the only hand-crafted SVG component.
+
 ## Key Scripts
 
 ```bash
