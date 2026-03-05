@@ -1,4 +1,6 @@
-<svg width="32" height="32" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="32" height="32" viewBox="0 0 20 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M10 2C10 2 5 7 5 11a5 5 0 0010 0C15 7 10 2 10 2z" fill="#f97316" opacity="0.9" />
   <path d="M10 6C10 6 7.5 9 7.5 11a2.5 2.5 0 005 0C12.5 9 10 6 10 6z" fill="#fbbf24" />
+  <rect x="3" y="15" width="14" height="2.5" rx="1.25" fill="#a0673a" transform="rotate(-12 10 16.25)" />
+  <rect x="3" y="15" width="14" height="2.5" rx="1.25" fill="#7a4f2b" transform="rotate(12 10 16.25)" />
 </svg>

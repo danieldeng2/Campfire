@@ -23,4 +23,6 @@ export const c = {
   // Campfire icon (intentionally fixed — brand identity)
   flameOuter: "#f97316",
   flameInner: "#fbbf24",
+  logLight: "#a0673a",
+  logDark: "#7a4f2b",
 } as const;
