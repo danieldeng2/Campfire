@@ -2,8 +2,9 @@
 
 import type { Slide } from "@/types/slides";
 import { c, ink } from "@/lib/colors";
+import { DropIndicator } from "./DragDrop";
 
-const THUMBNAIL_WIDTH = 176;
+export const THUMBNAIL_WIDTH = 176;
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 const THUMBNAIL_SCALE = THUMBNAIL_WIDTH / CANVAS_WIDTH;
@@ -48,20 +49,7 @@ export function SlideThumbnail({
       className="flex flex-col gap-1.5 cursor-pointer"
       style={{ userSelect: "none", opacity: isDragging ? 0.4 : 1, position: "relative" }}
     >
-      {/* Drop indicator */}
-      {isDragOver && (
-        <div
-          style={{
-            position: "absolute",
-            top: -10,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: c.brand,
-            borderRadius: 1,
-          }}
-        />
-      )}
+      {isDragOver && <DropIndicator offset={-10} />}
 
       <div
         style={{
@@ -116,10 +104,7 @@ export function SlideThumbnail({
           })}
         </div>
       </div>
-      <span
-        className="text-xs text-center"
-        style={{ color: isActive ? c.brand : ink(0.35) }}
-      >
+      <span className="text-xs text-center" style={{ color: isActive ? c.brand : ink(0.35) }}>
         {index + 1}
       </span>
     </div>

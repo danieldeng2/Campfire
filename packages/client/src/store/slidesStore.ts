@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { arrayMoveImmutable } from "array-move";
 import type { Deck, SlideElement, SlideRect } from "@/types/slides";
 import { HARDCODED_DECK } from "@/lib/hardcodedDeck";
 
@@ -40,8 +41,7 @@ export const useSlidesStore = create<SlidesState>()(
 
     reorderSlide: (from, to) =>
       set((state) => {
-        const [slide] = state.deck.slides.splice(from, 1);
-        state.deck.slides.splice(to, 0, slide);
+        state.deck.slides = arrayMoveImmutable(state.deck.slides, from, to);
       }),
 
     deleteSlide: (slideId) =>

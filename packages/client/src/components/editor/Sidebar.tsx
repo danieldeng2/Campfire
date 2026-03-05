@@ -5,7 +5,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { c, ink } from "@/lib/colors";
-import { SlideThumbnail } from "./SlideThumbnail";
+import { SlideThumbnail, THUMBNAIL_WIDTH } from "./SlideThumbnail";
+import { DropZone } from "./DragDrop";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 
 interface SlideContextMenu {
@@ -114,6 +115,23 @@ export function Sidebar() {
             }}
           />
         ))}
+
+        <DropZone
+          active={dragFromIndex !== null && dragFromIndex !== slides.length - 1}
+          width={THUMBNAIL_WIDTH}
+          showIndicator={dragOverIndex === slides.length}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOverIndex(slides.length);
+          }}
+          onDrop={() => {
+            if (dragFromIndex !== null) {
+              reorderSlide(dragFromIndex, slides.length - 1);
+            }
+            setDragFromIndex(null);
+            setDragOverIndex(null);
+          }}
+        />
       </div>
 
       {contextMenu && (
