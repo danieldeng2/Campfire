@@ -1,31 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useCanvasScale } from "@/hooks/useCanvasScale";
+import { useCanvasInteraction } from "@/hooks/useCanvasInteraction";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { Tool } from "@/types/editor";
-import type { SlideRect, TextStyle } from "@/types/slides";
 import { c } from "@/lib/colors";
 import { TextElement } from "./elements/TextElement";
-
-const DEFAULT_TEXT_STYLE: TextStyle = {
-  fontFamily: "Inter, sans-serif",
-  fontSize: 40,
-  fontWeight: 400,
-  fontStyle: "normal",
-  color: c.ink,
-  textAlign: "left",
-  lineHeight: 1.4,
-  letterSpacing: 0,
-};
-
-const MIN_DRAW_SIZE = 20;
-const MIN_BAND_DRAG_PX = 5;
-
-function rectsOverlap(a: SlideRect, b: SlideRect) {
-  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
-}
 
 export function SlideCanvas() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -37,110 +19,24 @@ export function SlideCanvas() {
   const addElement = useSlidesStore((s) => s.addElement);
   const activeSlide = slides.find((s) => s.id === activeSlideId);
 
-  // Text draw state
-  const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
-  const [drawRect, setDrawRect] = useState<SlideRect | null>(null);
+  const isTextTool = activeTool === Tool.Text;
 
-  // Rubber-band selection state (bandStart in screen px for threshold; bandRect in canvas px)
-  const [bandStart, setBandStart] = useState<{ x: number; y: number } | null>(null);
-  const [bandRect, setBandRect] = useState<SlideRect | null>(null);
+  const { drawRect, bandRect, handlePointerDown, handlePointerMove, handlePointerUp } =
+    useCanvasInteraction({
+      scale,
+      wrapperRef,
+      isTextTool,
+      activeSlide: activeSlide!,
+      addElement,
+      selectElements,
+      setEditingElement,
+      setActiveTool,
+    });
 
   if (!activeSlide) return null;
 
   const scaledWidth = canvasWidth * scale;
   const scaledHeight = canvasHeight * scale;
-  const isTextTool = activeTool === Tool.Text;
-
-  function toCanvasCoords(clientX: number, clientY: number) {
-    const bounds = wrapperRef.current!.getBoundingClientRect();
-    return {
-      x: (clientX - bounds.left) / scale,
-      y: (clientY - bounds.top) / scale,
-    };
-  }
-
-  function handlePointerDown(e: React.PointerEvent) {
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-
-    if (isTextTool) {
-      e.preventDefault();
-      const pt = toCanvasCoords(e.clientX, e.clientY);
-      setDrawStart(pt);
-      setDrawRect({ x: pt.x, y: pt.y, width: 0, height: 0 });
-    } else {
-      setBandStart({ x: e.clientX, y: e.clientY });
-      setBandRect(null);
-    }
-  }
-
-  function handlePointerMove(e: React.PointerEvent) {
-    if (drawStart) {
-      const pt = toCanvasCoords(e.clientX, e.clientY);
-      setDrawRect({
-        x: Math.min(drawStart.x, pt.x),
-        y: Math.min(drawStart.y, pt.y),
-        width: Math.abs(pt.x - drawStart.x),
-        height: Math.abs(pt.y - drawStart.y),
-      });
-      return;
-    }
-
-    if (bandStart) {
-      const start = toCanvasCoords(bandStart.x, bandStart.y);
-      const current = toCanvasCoords(e.clientX, e.clientY);
-      setBandRect({
-        x: Math.min(start.x, current.x),
-        y: Math.min(start.y, current.y),
-        width: Math.abs(current.x - start.x),
-        height: Math.abs(current.y - start.y),
-      });
-    }
-  }
-
-  function handlePointerUp(e: React.PointerEvent) {
-    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-
-    if (drawStart && drawRect) {
-      if (activeSlide && drawRect.width > MIN_DRAW_SIZE && drawRect.height > MIN_DRAW_SIZE) {
-        const id = crypto.randomUUID();
-        addElement(activeSlide.id, {
-          id,
-          type: "text",
-          rect: {
-            x: Math.round(drawRect.x),
-            y: Math.round(drawRect.y),
-            width: Math.round(drawRect.width),
-            height: Math.round(drawRect.height),
-          },
-          zIndex: activeSlide.elements.length + 1,
-          content: "",
-          style: DEFAULT_TEXT_STYLE,
-        });
-        setActiveTool(Tool.Move);
-        selectElements([id]);
-        setEditingElement(id);
-      }
-      setDrawStart(null);
-      setDrawRect(null);
-      return;
-    }
-
-    if (bandStart) {
-      const dx = e.clientX - bandStart.x;
-      const dy = e.clientY - bandStart.y;
-      if (dx * dx + dy * dy < MIN_BAND_DRAG_PX * MIN_BAND_DRAG_PX) {
-        // click on background: clear selection
-        selectElements([]);
-      } else if (bandRect && activeSlide) {
-        const ids = activeSlide.elements
-          .filter((el) => rectsOverlap(el.rect, bandRect))
-          .map((el) => el.id);
-        selectElements(ids);
-      }
-      setBandStart(null);
-      setBandRect(null);
-    }
-  }
 
   return (
     <div

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
+import { useSlideDrag } from "@/hooks/useSlideDrag";
 import { c, ink } from "@/lib/colors";
 import { SlideThumbnail, THUMBNAIL_WIDTH } from "./SlideThumbnail";
 import { DropZone } from "./DragDrop";
@@ -22,9 +23,12 @@ export function Sidebar() {
   const deleteSlide = useSlidesStore((s) => s.deleteSlide);
   const { activeSlideId, setActiveSlide } = useEditorStore();
 
-  const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [contextMenu, setContextMenu] = useState<SlideContextMenu | null>(null);
+
+  const { dragFromIndex, dragOverIndex, getDragHandlers, dropZoneProps } = useSlideDrag({
+    slideCount: slides.length,
+    reorderSlide,
+  });
 
   const handleAddSlide = () => {
     const newId = addSlide();
@@ -95,43 +99,11 @@ export function Sidebar() {
               e.preventDefault();
               setContextMenu({ x: e.clientX, y: e.clientY, slideId: slide.id });
             }}
-            onDragStart={() => setDragFromIndex(index)}
-            onDragOver={(e) => {
-              e.preventDefault();
-              if (dragFromIndex !== null && dragFromIndex !== index) {
-                setDragOverIndex(index);
-              }
-            }}
-            onDrop={() => {
-              if (dragFromIndex !== null && dragOverIndex !== null) {
-                reorderSlide(dragFromIndex, dragOverIndex);
-              }
-              setDragFromIndex(null);
-              setDragOverIndex(null);
-            }}
-            onDragEnd={() => {
-              setDragFromIndex(null);
-              setDragOverIndex(null);
-            }}
+            {...getDragHandlers(index)}
           />
         ))}
 
-        <DropZone
-          active={dragFromIndex !== null && dragFromIndex !== slides.length - 1}
-          width={THUMBNAIL_WIDTH}
-          showIndicator={dragOverIndex === slides.length}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOverIndex(slides.length);
-          }}
-          onDrop={() => {
-            if (dragFromIndex !== null) {
-              reorderSlide(dragFromIndex, slides.length - 1);
-            }
-            setDragFromIndex(null);
-            setDragOverIndex(null);
-          }}
-        />
+        <DropZone width={THUMBNAIL_WIDTH} {...dropZoneProps} />
       </div>
 
       {contextMenu && (
