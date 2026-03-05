@@ -14,7 +14,7 @@ export const HARDCODED_DECK: Deck = {
           type: "text",
           rect: { x: 160, y: 280, width: 1600, height: 220 },
           zIndex: 1,
-          content: "Welcome to Campfire",
+          content: "Welcome to Campfire 🔥",
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 96,
