@@ -13,6 +13,7 @@ export function SidebarSection({ label, children }: Props) {
       style={{
         borderBottom: `1px solid ${ink(0.06)}`,
         paddingBottom: 12,
+        paddingTop: 8,
       }}
     >
       <div
@@ -20,7 +21,7 @@ export function SidebarSection({ label, children }: Props) {
           height: 32,
           display: "flex",
           alignItems: "center",
-          padding: "0 12px",
+          padding: "0px 12px",
         }}
       >
         <span

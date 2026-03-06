@@ -47,18 +47,20 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col shrink-0 overflow-hidden"
+      className="flex flex-col shrink-0"
       style={{
         width: 208,
         background: c.surface,
         borderRight: `1px solid ${ink(0.08)}`,
+        paddingTop: 8,
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-3 shrink-0" style={{ height: 36 }}>
-        <span className="text-sm font-medium" style={{ color: c.ink }}>
-          Slides
-        </span>
+      <div
+        className="flex items-center justify-between shrink-0"
+        style={{ height: 32, paddingLeft: 16, paddingRight: 12 }}
+      >
+        <span style={{ fontSize: 12, fontWeight: 700, color: ink(0.85) }}>Slides</span>
         <button
           onClick={handleAddSlide}
           title="New slide"
@@ -85,7 +87,10 @@ export function Sidebar() {
       </div>
 
       {/* Slide list */}
-      <div className="flex flex-col items-center gap-4 py-4 overflow-y-auto">
+      <div
+        className="flex flex-col gap-4 py-4 scrollbar-track-transparent"
+        style={{ overflowY: "scroll", paddingLeft: 16, flex: 1, minHeight: 0, marginRight: 2 }}
+      >
         {slides.map((slide, index) => (
           <SlideThumbnail
             key={slide.id}
