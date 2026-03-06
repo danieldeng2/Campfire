@@ -7,11 +7,13 @@ interface EditorState {
   editingElementId: string | null;
   activeTool: Tool;
   selectionRange: { start: number; end: number } | null;
+  snapLines: { showH: boolean; showV: boolean };
   setActiveSlide: (id: string) => void;
   selectElements: (ids: string[]) => void;
   setEditingElement: (id: string | null) => void;
   setActiveTool: (tool: Tool) => void;
   setSelectionRange: (range: { start: number; end: number } | null) => void;
+  setSnapLines: (snap: { showH: boolean; showV: boolean }) => void;
 }
 
 export const useEditorStore = create<EditorState>()((set) => ({
@@ -20,6 +22,7 @@ export const useEditorStore = create<EditorState>()((set) => ({
   editingElementId: null,
   activeTool: Tool.Move,
   selectionRange: null,
+  snapLines: { showH: false, showV: false },
   setActiveSlide: (id) =>
     set({
       activeSlideId: id,
@@ -33,4 +36,5 @@ export const useEditorStore = create<EditorState>()((set) => ({
   setActiveTool: (tool) =>
     set({ activeTool: tool, selectedElementIds: [], editingElementId: null, selectionRange: null }),
   setSelectionRange: (range) => set({ selectionRange: range }),
+  setSnapLines: (snap) => set({ snapLines: snap }),
 }));

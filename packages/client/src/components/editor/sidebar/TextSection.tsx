@@ -1,6 +1,6 @@
 "use client";
 
-import { AlignLeft, AlignCenter, AlignRight, Italic } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, Italic, Underline, Strikethrough } from "lucide-react";
 import type { TextElement, ResolvedStyles, TextStyle } from "@/types/slides";
 import { MIXED } from "@/types/slides";
 import { useSlidesStore } from "@/store/slidesStore";
@@ -11,6 +11,7 @@ import { ColorSwatch } from "@/components/UILibrary/ColorSwatch";
 import { ToggleButton } from "@/components/UILibrary/ToggleButton";
 import { SelectInput } from "@/components/UILibrary/SelectInput";
 import { ink } from "@/lib/colors";
+import { toggleUnderline, toggleStrikethrough } from "@/lib/textDecorationUtils";
 
 const FONT_SIZES = [
   8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48, 56, 64, 72, 80, 88, 96, 112, 128,
@@ -63,10 +64,30 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
     }
   }
 
-  const { fontSize, fontWeight, fontStyle, color, textAlign, lineHeight, letterSpacing } =
-    resolvedStyles;
+  const {
+    fontSize,
+    fontWeight,
+    fontStyle,
+    textDecoration,
+    color,
+    textAlign,
+    lineHeight,
+    letterSpacing,
+  } = resolvedStyles;
 
   const isItalic = fontStyle === "italic" ? true : fontStyle === MIXED ? MIXED : false;
+  const isUnderline =
+    textDecoration === MIXED
+      ? MIXED
+      : textDecoration === "underline" || textDecoration === "underline line-through"
+        ? true
+        : false;
+  const isStrikethrough =
+    textDecoration === MIXED
+      ? MIXED
+      : textDecoration === "line-through" || textDecoration === "underline line-through"
+        ? true
+        : false;
 
   return (
     <SidebarSection label="Text">
@@ -100,6 +121,24 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
               onClick={() =>
                 applyStyle({ fontStyle: fontStyle === "italic" ? "normal" : "italic" })
               }
+            />
+            <ToggleButton
+              icon={<Underline size={13} />}
+              active={isUnderline}
+              label="Underline"
+              onClick={() => {
+                const cur = textDecoration === MIXED ? "none" : textDecoration;
+                applyStyle({ textDecoration: toggleUnderline(cur) });
+              }}
+            />
+            <ToggleButton
+              icon={<Strikethrough size={13} />}
+              active={isStrikethrough}
+              label="Strikethrough"
+              onClick={() => {
+                const cur = textDecoration === MIXED ? "none" : textDecoration;
+                applyStyle({ textDecoration: toggleStrikethrough(cur) });
+              }}
             />
           </div>
         </div>

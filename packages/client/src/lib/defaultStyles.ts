@@ -6,6 +6,7 @@ export const DEFAULT_TEXT_STYLE: TextStyle = {
   fontSize: 40,
   fontWeight: 400,
   fontStyle: "normal",
+  textDecoration: "none",
   color: c.ink,
   textAlign: "left",
   lineHeight: 1.4,

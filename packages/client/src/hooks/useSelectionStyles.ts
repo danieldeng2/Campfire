@@ -2,21 +2,7 @@ import { useEffect, useState } from "react";
 import type { TextElement, TextStyle, ResolvedStyles, StyleValue } from "@/types/slides";
 import { MIXED } from "@/types/slides";
 import { useEditorStore } from "@/store/editorStore";
-
-/** Returns the character offset of a position within a contentEditable element */
-function getCharOffset(container: HTMLElement, node: Node, offset: number): number {
-  let charCount = 0;
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-  let current = walker.nextNode();
-  while (current) {
-    if (current === node) {
-      return charCount + offset;
-    }
-    charCount += (current.textContent ?? "").length;
-    current = walker.nextNode();
-  }
-  return charCount + offset;
-}
+import { getCharOffset } from "@/lib/domSelection";
 
 /** Pure function: resolves styles for a character range across runs */
 export function resolveStylesForRange(
@@ -32,6 +18,7 @@ export function resolveStylesForRange(
     fontSize: new Set(),
     fontWeight: new Set(),
     fontStyle: new Set(),
+    textDecoration: new Set(),
     color: new Set(),
     textAlign: new Set(),
     lineHeight: new Set(),
@@ -64,6 +51,9 @@ export function resolveStylesForRange(
     fontSize: pick<number>("fontSize"),
     fontWeight: pick<number>("fontWeight"),
     fontStyle: pick<"normal" | "italic">("fontStyle"),
+    textDecoration: pick<"none" | "underline" | "line-through" | "underline line-through">(
+      "textDecoration"
+    ),
     color: pick<string>("color"),
     textAlign: pick<"left" | "center" | "right">("textAlign"),
     lineHeight: pick<number>("lineHeight"),
@@ -78,6 +68,7 @@ export function resolveStylesForElements(elements: TextElement[]): ResolvedStyle
       fontSize: MIXED,
       fontWeight: MIXED,
       fontStyle: MIXED,
+      textDecoration: MIXED,
       color: MIXED,
       textAlign: MIXED,
       lineHeight: MIXED,
@@ -93,6 +84,7 @@ export function resolveStylesForElements(elements: TextElement[]): ResolvedStyle
     fontSize: new Set(),
     fontWeight: new Set(),
     fontStyle: new Set(),
+    textDecoration: new Set(),
     color: new Set(),
     textAlign: new Set(),
     lineHeight: new Set(),
@@ -116,6 +108,9 @@ export function resolveStylesForElements(elements: TextElement[]): ResolvedStyle
     fontSize: pick<number>("fontSize"),
     fontWeight: pick<number>("fontWeight"),
     fontStyle: pick<"normal" | "italic">("fontStyle"),
+    textDecoration: pick<"none" | "underline" | "line-through" | "underline line-through">(
+      "textDecoration"
+    ),
     color: pick<string>("color"),
     textAlign: pick<"left" | "center" | "right">("textAlign"),
     lineHeight: pick<number>("lineHeight"),

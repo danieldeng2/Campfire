@@ -13,7 +13,7 @@ export function SlideCanvas() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { scale, canvasWidth, canvasHeight, containerRef } = useCanvasScale();
 
-  const { activeSlideId, activeTool, selectElements, setEditingElement, setActiveTool } =
+  const { activeSlideId, activeTool, selectElements, setEditingElement, setActiveTool, snapLines } =
     useEditorStore();
   const slides = useSlidesStore((s) => s.deck.slides);
   const addElement = useSlidesStore((s) => s.addElement);
@@ -102,6 +102,34 @@ export function SlideCanvas() {
                 background: c.brandGhost,
                 pointerEvents: "none",
                 borderRadius: 2,
+              }}
+            />
+          )}
+
+          {/* Center snap lines */}
+          {snapLines.showV && (
+            <div
+              style={{
+                position: "absolute",
+                left: 959,
+                top: 0,
+                width: 2,
+                height: 1080,
+                backgroundColor: c.danger,
+                pointerEvents: "none",
+              }}
+            />
+          )}
+          {snapLines.showH && (
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 539,
+                width: 1920,
+                height: 2,
+                backgroundColor: c.danger,
+                pointerEvents: "none",
               }}
             />
           )}

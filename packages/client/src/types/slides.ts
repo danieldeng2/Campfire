@@ -10,6 +10,7 @@ export interface TextStyle {
   fontSize: number;
   fontWeight: number;
   fontStyle: "normal" | "italic";
+  textDecoration: "none" | "underline" | "line-through" | "underline line-through";
   color: string;
   textAlign: "left" | "center" | "right";
   lineHeight: number;
@@ -38,6 +39,7 @@ export interface ResolvedStyles {
   fontSize: StyleValue<number>;
   fontWeight: StyleValue<number>;
   fontStyle: StyleValue<"normal" | "italic">;
+  textDecoration: StyleValue<"none" | "underline" | "line-through" | "underline line-through">;
   color: StyleValue<string>;
   textAlign: StyleValue<"left" | "center" | "right">;
   lineHeight: StyleValue<number>;

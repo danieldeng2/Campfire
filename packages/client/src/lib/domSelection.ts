@@ -23,6 +23,14 @@ export function domToRuns(container: HTMLElement): { content: string; runs: Styl
       if (el.style.fontWeight) style.fontWeight = parseInt(el.style.fontWeight, 10);
       if (el.style.fontStyle && el.style.fontStyle !== "normal")
         style.fontStyle = el.style.fontStyle as "italic";
+      const td = el.style.textDecoration;
+      if (td) {
+        const hasUnderline = td.includes("underline");
+        const hasStrike = td.includes("line-through");
+        if (hasUnderline && hasStrike) style.textDecoration = "underline line-through";
+        else if (hasUnderline) style.textDecoration = "underline";
+        else if (hasStrike) style.textDecoration = "line-through";
+      }
       if (el.style.color) style.color = el.style.color;
       if (el.style.letterSpacing) style.letterSpacing = parseFloat(el.style.letterSpacing);
       runs.push({ text, style });

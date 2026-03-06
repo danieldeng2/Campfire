@@ -14,6 +14,8 @@ function runStyleToCss(runStyle: Partial<TextStyle>): string {
   if (runStyle.fontSize !== undefined) parts.push(`font-size:${runStyle.fontSize}px`);
   if (runStyle.fontWeight !== undefined) parts.push(`font-weight:${runStyle.fontWeight}`);
   if (runStyle.fontStyle !== undefined) parts.push(`font-style:${runStyle.fontStyle}`);
+  if (runStyle.textDecoration !== undefined)
+    parts.push(`text-decoration:${runStyle.textDecoration}`);
   if (runStyle.color !== undefined) parts.push(`color:${runStyle.color}`);
   if (runStyle.letterSpacing !== undefined)
     parts.push(`letter-spacing:${runStyle.letterSpacing}px`);

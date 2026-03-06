@@ -1,8 +1,10 @@
 import { useEffect, useCallback } from "react";
-import type { StyleRun, TextStyle } from "@/types/slides";
+import type { StyleRun, TextStyle, TextElement } from "@/types/slides";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { useEditorStore } from "@/store/editorStore";
 import { domToRuns, getCharOffset, restoreCharSelection } from "@/lib/domSelection";
+import { resolveStylesForRange } from "@/hooks/useSelectionStyles";
+import { toggleUnderline, toggleStrikethrough } from "@/lib/textDecorationUtils";
 
 interface Options {
   id: string;
@@ -14,6 +16,13 @@ interface Options {
   isEditing: boolean;
   contentRef: React.RefObject<HTMLDivElement | null>;
   updateElementContent: (slideId: string, id: string, content: string, runs?: StyleRun[]) => void;
+  updateElementStyle: (slideId: string, elementId: string, patch: Partial<TextStyle>) => void;
+  updateElementStyleRange: (
+    slideId: string,
+    elementId: string,
+    range: { start: number; end: number },
+    patch: Partial<TextStyle>
+  ) => void;
   selectElements: (ids: string[]) => void;
   setEditingElement: (id: string | null) => void;
 }
@@ -28,6 +37,8 @@ export function useTextEditing({
   isEditing,
   contentRef,
   updateElementContent,
+  updateElementStyle,
+  updateElementStyleRange,
   selectElements,
   setEditingElement,
 }: Options) {
@@ -122,9 +133,72 @@ export function useTextEditing({
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
         contentRef.current?.blur();
+        return;
+      }
+
+      const modKey = e.metaKey || e.ctrlKey;
+      if (!modKey) return;
+
+      // Shared helpers for formatting shortcuts
+      function getResolved() {
+        const { selectionRange: currentRange } = useEditorStore.getState();
+        const resolveStart = currentRange?.start ?? 0;
+        const resolveEnd =
+          currentRange && currentRange.end > currentRange.start
+            ? currentRange.end
+            : resolveStart + 1;
+        const resolved = resolveStylesForRange(
+          { id, content, runs, style } as TextElement,
+          resolveStart,
+          resolveEnd
+        );
+        return { currentRange, resolved };
+      }
+
+      function applyPatch(
+        patch: Partial<TextStyle>,
+        currentRange: { start: number; end: number } | null
+      ) {
+        if (currentRange && currentRange.start !== currentRange.end) {
+          updateElementStyleRange(slideId, id, currentRange, patch);
+        } else {
+          updateElementStyle(slideId, id, patch);
+        }
+      }
+
+      if (e.key === "b" || e.key === "B") {
+        e.preventDefault();
+        const { currentRange, resolved } = getResolved();
+        const isBold = typeof resolved.fontWeight === "number" && resolved.fontWeight >= 700;
+        applyPatch({ fontWeight: isBold ? 400 : 700 }, currentRange);
+        return;
+      }
+
+      if (e.key === "i" || e.key === "I") {
+        e.preventDefault();
+        const { currentRange, resolved } = getResolved();
+        const isItalic = resolved.fontStyle === "italic";
+        applyPatch({ fontStyle: isItalic ? "normal" : "italic" }, currentRange);
+        return;
+      }
+
+      if (!e.shiftKey && (e.key === "u" || e.key === "U")) {
+        e.preventDefault();
+        const { currentRange, resolved } = getResolved();
+        const cur = resolved.textDecoration === "Mixed" ? "none" : resolved.textDecoration;
+        applyPatch({ textDecoration: toggleUnderline(cur) }, currentRange);
+        return;
+      }
+
+      if (e.shiftKey && (e.key === "x" || e.key === "X")) {
+        e.preventDefault();
+        const { currentRange, resolved } = getResolved();
+        const cur = resolved.textDecoration === "Mixed" ? "none" : resolved.textDecoration;
+        applyPatch({ textDecoration: toggleStrikethrough(cur) }, currentRange);
+        return;
       }
     },
-    [contentRef]
+    [contentRef, id, slideId, content, runs, style, updateElementStyle, updateElementStyleRange]
   );
 
   return { handleClick, handleDoubleClick, handleBlur, handleKeyDown };

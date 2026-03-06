@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSlidesStore } from "@/store/slidesStore";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { PresentToolbar } from "@/components/present/PresentToolbar";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import "reveal.js/dist/reveal.css";
 import "reveal.js/dist/theme/black.css";
 
@@ -49,8 +50,8 @@ export default function PresentPage() {
         center: true,
         hash: false,
         transition: "slide",
-        width: 1920,
-        height: 1080,
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
         margin: 0,
       });
       await revealInstance.current.initialize();
@@ -98,18 +99,19 @@ export default function PresentPage() {
                     key={el.id}
                     style={{
                       position: "absolute",
-                      left: `${(el.rect.x / 1920) * 100}%`,
-                      top: `${(el.rect.y / 1080) * 100}%`,
-                      width: `${(el.rect.width / 1920) * 100}%`,
-                      height: `${(el.rect.height / 1080) * 100}%`,
+                      left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
+                      top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
+                      width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
+                      height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
                       fontFamily: el.style.fontFamily,
-                      fontSize: `${(el.style.fontSize / 1080) * 100}vh`,
+                      fontSize: `${(el.style.fontSize / CANVAS_HEIGHT) * 100}vh`,
                       fontWeight: el.style.fontWeight,
                       fontStyle: el.style.fontStyle,
+                      textDecoration: el.style.textDecoration,
                       color: el.style.color,
                       textAlign: el.style.textAlign,
                       lineHeight: el.style.lineHeight,
-                      letterSpacing: `${el.style.letterSpacing / 1080}em`,
+                      letterSpacing: `${el.style.letterSpacing / CANVAS_HEIGHT}em`,
                       whiteSpace: "pre-wrap",
                       wordBreak: "break-word",
                     }}

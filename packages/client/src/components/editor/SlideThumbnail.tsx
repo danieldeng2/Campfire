@@ -91,11 +91,11 @@ export function SlideThumbnail({
                   fontFamily: el.style.fontFamily,
                   fontSize: el.style.fontSize,
                   fontWeight: el.style.fontWeight,
+                  textDecoration: el.style.textDecoration,
                   color: el.style.color,
                   textAlign: el.style.textAlign,
                   lineHeight: el.style.lineHeight,
                   whiteSpace: "pre-wrap",
-                  overflow: "hidden",
                 }}
               >
                 {el.content}

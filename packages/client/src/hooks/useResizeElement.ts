@@ -2,12 +2,11 @@
 
 import { useCallback, useRef } from "react";
 import type { SlideRect } from "@/types/slides";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 
 export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 
 const MIN_SIZE = 20;
-const CANVAS_W = 1920;
-const CANVAS_H = 1080;
 
 function computeResizedRect(
   startRect: SlideRect,
@@ -43,8 +42,8 @@ function computeResizedRect(
   }
 
   // Clamp to canvas bounds
-  x = Math.max(0, Math.min(CANVAS_W - width, x));
-  y = Math.max(0, Math.min(CANVAS_H - height, y));
+  x = Math.max(0, Math.min(CANVAS_WIDTH - width, x));
+  y = Math.max(0, Math.min(CANVAS_HEIGHT - height, y));
 
   return {
     x: Math.round(x),
