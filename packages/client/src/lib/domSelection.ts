@@ -1,12 +1,24 @@
 import type { StyleRun, TextStyle } from "@/types/slides";
 
+/** Extract text treating <br> as \n and block elements as newline-prefixed */
+function extractText(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? "";
+  const el = node as Element;
+  if (el.tagName === "BR") return "\n";
+  const inner = Array.from(node.childNodes).map(extractText).join("");
+  if (el.tagName === "DIV" || el.tagName === "P") return "\n" + inner;
+  return inner;
+}
+
 /** Serialize the contentEditable DOM back to StyleRun[] by reading span structure */
 export function domToRuns(container: HTMLElement): { content: string; runs: StyleRun[] } {
-  const content = container.textContent ?? "";
+  const content = Array.from(container.childNodes).map(extractText).join("");
   const children = Array.from(container.childNodes);
 
-  // If no spans, return empty runs (plain text)
-  const hasSpans = children.some((n) => n.nodeType === Node.ELEMENT_NODE);
+  // If no styled spans (br-only elements don't count), return empty runs (plain text)
+  const hasSpans = children.some(
+    (n) => n.nodeType === Node.ELEMENT_NODE && (n as Element).tagName !== "BR"
+  );
   if (!hasSpans) return { content, runs: [] };
 
   const runs: StyleRun[] = [];
@@ -14,9 +26,11 @@ export function domToRuns(container: HTMLElement): { content: string; runs: Styl
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent ?? "";
       if (text) runs.push({ text, style: {} });
+    } else if ((node as Element).tagName === "BR") {
+      runs.push({ text: "\n", style: {} });
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const el = node as HTMLElement;
-      const text = el.textContent ?? "";
+      const text = extractText(el);
       if (!text) continue;
       const style: Partial<TextStyle> = {};
       if (el.style.fontSize) style.fontSize = parseFloat(el.style.fontSize);
