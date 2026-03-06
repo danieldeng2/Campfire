@@ -1,4 +1,5 @@
 import { Deck } from "@/types/slides";
+import { c, ink } from "@/lib/colors";
 
 export const HARDCODED_DECK: Deck = {
   id: "deck-001",
@@ -41,7 +42,7 @@ export const HARDCODED_DECK: Deck = {
             fontWeight: 400,
             fontStyle: "normal",
             textDecoration: "none",
-            color: "rgba(0,0,0,0.45)",
+            color: ink(0.45),
             textAlign: "center",
             lineHeight: 1.5,
             letterSpacing: 0,
@@ -86,7 +87,7 @@ export const HARDCODED_DECK: Deck = {
             fontWeight: 400,
             fontStyle: "normal",
             textDecoration: "none",
-            color: "rgba(0,0,0,0.6)",
+            color: ink(0.6),
             textAlign: "left",
             lineHeight: 1.6,
             letterSpacing: 0,
@@ -112,7 +113,7 @@ export const HARDCODED_DECK: Deck = {
             fontWeight: 700,
             fontStyle: "normal",
             textDecoration: "none",
-            color: "#f97316",
+            color: c.brand,
             textAlign: "center",
             lineHeight: 1.2,
             letterSpacing: -2,

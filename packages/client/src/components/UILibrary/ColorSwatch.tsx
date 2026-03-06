@@ -1,11 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ChevronDown, Pipette } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { c, ink } from "@/lib/colors";
 import { MIXED } from "@/types/slides";
 import type { MixedValue } from "@/types/slides";
-import { COLOR_COLUMNS, NUM_COLS, NUM_ROWS, parseColor, buildColor } from "@/lib/colorUtils";
+import { parseColor, buildColor } from "@/lib/colorUtils";
+import { ColorPickerPanel } from "./ColorPickerPanel";
 
 interface Props {
   value: string | MixedValue;
@@ -17,103 +18,6 @@ const SPIN_HIDE = `
   .campfire-opacity-input::-webkit-inner-spin-button,
   .campfire-opacity-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 ` as const;
-
-interface ColorPickerPanelProps {
-  baseHex: string;
-  isMixed: boolean;
-  onSelectHex: (hex: string) => void;
-  onCustomColor: (hex: string) => void;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-}
-
-function ColorPickerPanel({
-  baseHex,
-  isMixed,
-  onSelectHex,
-  onCustomColor,
-  inputRef,
-}: ColorPickerPanelProps) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        padding: 8,
-        border: `1px solid ${ink(0.08)}`,
-        borderRadius: 6,
-        background: c.surface,
-      }}
-    >
-      {/* Color grid: columns = hues, rows = shades */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${NUM_COLS}, 1fr)`,
-          gridTemplateRows: `repeat(${NUM_ROWS}, 1fr)`,
-          gap: 3,
-        }}
-      >
-        {Array.from({ length: NUM_ROWS }, (_, row) =>
-          Array.from({ length: NUM_COLS }, (_, col) => {
-            const swatchHex = COLOR_COLUMNS[col][row].toLowerCase();
-            const isSelected = !isMixed && baseHex === swatchHex;
-            return (
-              <button
-                key={`${col}-${row}`}
-                title={swatchHex}
-                onClick={() => onSelectHex(swatchHex)}
-                style={{
-                  aspectRatio: "1",
-                  borderRadius: 3,
-                  border: `1px solid ${isSelected ? c.brand : ink(0.1)}`,
-                  background: swatchHex,
-                  cursor: "pointer",
-                  padding: 0,
-                  outline: isSelected ? `2px solid ${c.brand}` : "none",
-                  outlineOffset: 1,
-                  transition: "outline 0.1s",
-                }}
-              />
-            );
-          })
-        )}
-      </div>
-
-      {/* Custom color */}
-      <button
-        onClick={() => inputRef.current?.click()}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 6,
-          height: 26,
-          border: `1px solid ${ink(0.1)}`,
-          borderRadius: 5,
-          background: c.surface,
-          cursor: "pointer",
-          fontSize: 11,
-          color: ink(0.85),
-          fontWeight: 500,
-          transition: "border-color 0.1s",
-        }}
-      >
-        <Pipette size={12} />
-        Custom color
-      </button>
-
-      <input
-        ref={inputRef}
-        type="color"
-        value={isMixed ? "#000000" : baseHex}
-        onChange={(e) => onCustomColor(e.target.value)}
-        style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}
-        tabIndex={-1}
-      />
-    </div>
-  );
-}
 
 export function ColorSwatch({ value, onChange, label }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);

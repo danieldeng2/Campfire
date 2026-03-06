@@ -11,6 +11,18 @@ import type {
 } from "@/types/slides";
 import { HARDCODED_DECK } from "@/lib/hardcodedDeck";
 
+// Module-level helpers to avoid repeating the slide + element lookup in every action
+function findEl(state: { deck: Deck }, slideId: string, elementId: string) {
+  return (
+    state.deck.slides.find((s) => s.id === slideId)?.elements.find((e) => e.id === elementId) ??
+    null
+  );
+}
+function findTextEl(state: { deck: Deck }, slideId: string, elementId: string) {
+  const el = findEl(state, slideId, elementId);
+  return el?.type === "text" ? el : null;
+}
+
 interface SlidesState {
   deck: Deck;
   updateElementRect: (slideId: string, elementId: string, rect: SlideRect) => void;
@@ -42,19 +54,16 @@ export const useSlidesStore = create<SlidesState>()(
 
     updateElementRect: (slideId, elementId, rect) =>
       set((state) => {
-        const slide = state.deck.slides.find((s) => s.id === slideId);
-        const el = slide?.elements.find((e) => e.id === elementId);
+        const el = findEl(state, slideId, elementId);
         if (el) el.rect = rect;
       }),
 
     updateElementContent: (slideId, elementId, content, runs) =>
       set((state) => {
-        const slide = state.deck.slides.find((s) => s.id === slideId);
-        const el = slide?.elements.find((e) => e.id === elementId);
-        if (el && el.type === "text") {
-          el.content = content;
-          if (runs !== undefined) el.runs = runs;
-        }
+        const el = findTextEl(state, slideId, elementId);
+        if (!el) return;
+        el.content = content;
+        if (runs !== undefined) el.runs = runs;
       }),
 
     updateSlideBackground: (slideId, background) =>
@@ -65,9 +74,8 @@ export const useSlidesStore = create<SlidesState>()(
 
     updateElementStyle: (slideId, elementId, patch) =>
       set((state) => {
-        const slide = state.deck.slides.find((s) => s.id === slideId);
-        const el = slide?.elements.find((e) => e.id === elementId);
-        if (el && el.type === "text") {
+        const el = findTextEl(state, slideId, elementId);
+        if (el) {
           Object.assign(el.style, patch);
           // Strip patched properties from all runs so the base style takes effect everywhere
           const patchKeys = Object.keys(patch) as (keyof TextStyle)[];
@@ -83,9 +91,8 @@ export const useSlidesStore = create<SlidesState>()(
 
     updateElementStyleRange: (slideId, elementId, range, patch) =>
       set((state) => {
-        const slide = state.deck.slides.find((s) => s.id === slideId);
-        const el = slide?.elements.find((e) => e.id === elementId);
-        if (!el || el.type !== "text") return;
+        const el = findTextEl(state, slideId, elementId);
+        if (!el) return;
 
         // Flatten content into per-character style entries
         const text = el.content;
@@ -142,7 +149,7 @@ export const useSlidesStore = create<SlidesState>()(
     addElement: (slideId, element) =>
       set((state) => {
         const slide = state.deck.slides.find((s) => s.id === slideId);
-        if (slide) slide.elements.push(element);
+        slide?.elements.push(element);
       }),
 
     deleteElement: (slideId, elementId) =>

@@ -2,11 +2,11 @@
 
 import type { Slide } from "@/types/slides";
 import { c, ink } from "@/lib/colors";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import { DropIndicator } from "./DragDrop";
+import { ScaledCanvas } from "./ScaledCanvas";
 
 export const THUMBNAIL_WIDTH = 176;
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
 const THUMBNAIL_SCALE = THUMBNAIL_WIDTH / CANVAS_WIDTH;
 const THUMBNAIL_HEIGHT = Math.round(CANVAS_HEIGHT * THUMBNAIL_SCALE);
 
@@ -64,19 +64,7 @@ export function SlideThumbnail({
         }}
       >
         {/* Inner canvas scaled down */}
-        <div
-          style={{
-            width: CANVAS_WIDTH,
-            height: CANVAS_HEIGHT,
-            backgroundColor: slide.background.value,
-            transform: `scale(${THUMBNAIL_SCALE})`,
-            transformOrigin: "top left",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            pointerEvents: "none",
-          }}
-        >
+        <ScaledCanvas scale={THUMBNAIL_SCALE} background={slide.background.value}>
           {slide.elements.map((el) => {
             if (el.type !== "text") return null;
             return (
@@ -102,7 +90,7 @@ export function SlideThumbnail({
               </div>
             );
           })}
-        </div>
+        </ScaledCanvas>
       </div>
       <span className="text-xs text-center" style={{ color: isActive ? c.brand : ink(0.35) }}>
         {index + 1}

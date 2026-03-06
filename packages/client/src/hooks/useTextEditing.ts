@@ -160,6 +160,8 @@ export function useTextEditing({
         currentRange: { start: number; end: number } | null
       ) {
         if (currentRange && currentRange.start !== currentRange.end) {
+          // Flush live DOM content to store first so updateElementStyleRange sees the correct text
+          useEditorStore.getState().flushEditingContent?.();
           updateElementStyleRange(slideId, id, currentRange, patch);
         } else {
           updateElementStyle(slideId, id, patch);

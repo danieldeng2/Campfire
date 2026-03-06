@@ -56,6 +56,8 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
       }
       if (hasRunPatch) {
         if (currentRange && currentRange.start !== currentRange.end) {
+          // Flush live DOM content to store first so updateElementStyleRange sees the correct text
+          useEditorStore.getState().flushEditingContent?.();
           updateElementStyleRange(activeSlideId, el.id, currentRange, runPatch);
         } else {
           updateElementStyle(activeSlideId, el.id, runPatch);

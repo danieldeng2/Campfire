@@ -1,10 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
-const CANVAS_SCALE = 0.94;
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE } from "@/lib/canvasConstants";
 
 export function computeScale(width: number, height: number) {
   const scaleX = width / CANVAS_WIDTH;

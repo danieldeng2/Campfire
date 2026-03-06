@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect, useCallback } from "react";
+import { useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { TextElement as TextElementType } from "@/types/slides";
 import { useSlidesStore } from "@/store/slidesStore";
@@ -10,7 +10,7 @@ import { useTextEditing } from "@/hooks/useTextEditing";
 import { useSelectionStyles } from "@/hooks/useSelectionStyles";
 import { useResizeElement } from "@/hooks/useResizeElement";
 import { runsToHtml } from "@/lib/runsToHtml";
-import { restoreCharSelection } from "@/lib/domSelection";
+import { domToRuns, restoreCharSelection } from "@/lib/domSelection";
 import { c } from "@/lib/colors";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 import { SelectionBox } from "./SelectionBox";
@@ -33,6 +33,7 @@ export function TextElement({ element, slideId, scale }: Props) {
     selectElements,
     setEditingElement,
     setSnapLines,
+    setFlushEditingContent,
   } = useEditorStore();
 
   const onSnapChange = useCallback(
@@ -89,12 +90,30 @@ export function TextElement({ element, slideId, scale }: Props) {
     onResize: (newRect) => updateElementRect(slideId, id, newRect),
   });
 
+  // Register a flush callback so sidebar/keyboard handlers can save live DOM content
+  // to the store before applying a style range (avoids stale el.content when user has typed unsaved text).
+  useEffect(() => {
+    if (!isEditing) {
+      setFlushEditingContent(null);
+      return;
+    }
+    setFlushEditingContent(() => {
+      if (contentRef.current) {
+        const { content: liveContent, runs: liveRuns } = domToRuns(contentRef.current);
+        updateElementContent(slideId, id, liveContent, liveRuns);
+      }
+    });
+    return () => setFlushEditingContent(null);
+  }, [isEditing, slideId, id, setFlushEditingContent, updateElementContent]);
+
   // When runs change while already editing (style mutation from sidebar), update DOM and restore selection
   useLayoutEffect(() => {
     if (!isEditing || !contentRef.current) return;
     if (runs === prevRunsRef.current) return;
     prevRunsRef.current = runs;
-    contentRef.current.innerHTML = runsToHtml(content, runs, style);
+    // Use live DOM content so unsaved typed text isn't lost (store content is stale during editing)
+    const { content: liveContent } = domToRuns(contentRef.current);
+    contentRef.current.innerHTML = runsToHtml(liveContent, runs, style);
     if (selectionRange) {
       contentRef.current.focus();
       restoreCharSelection(contentRef.current, selectionRange.start, selectionRange.end);

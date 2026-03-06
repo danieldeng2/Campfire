@@ -7,11 +7,13 @@ import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { Tool } from "@/types/editor";
 import { c } from "@/lib/colors";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import { TextElement } from "./elements/TextElement";
+import { ScaledCanvas } from "./ScaledCanvas";
 
 export function SlideCanvas() {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { scale, canvasWidth, canvasHeight, containerRef } = useCanvasScale();
+  const { scale, containerRef } = useCanvasScale();
 
   const { activeSlideId, activeTool, selectElements, setEditingElement, setActiveTool, snapLines } =
     useEditorStore();
@@ -35,8 +37,8 @@ export function SlideCanvas() {
 
   if (!activeSlide) return null;
 
-  const scaledWidth = canvasWidth * scale;
-  const scaledHeight = canvasHeight * scale;
+  const scaledWidth = CANVAS_WIDTH * scale;
+  const scaledHeight = CANVAS_HEIGHT * scale;
 
   return (
     <div
@@ -67,18 +69,10 @@ export function SlideCanvas() {
         onPointerUp={handlePointerUp}
       >
         {/* Inner canvas: always 1920x1080, scaled via CSS transform */}
-        <div
-          style={{
-            width: canvasWidth,
-            height: canvasHeight,
-            backgroundColor: activeSlide.background.value,
-            transform: `scale(${scale})`,
-            transformOrigin: "top left",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            pointerEvents: isTextTool ? "none" : "auto",
-          }}
+        <ScaledCanvas
+          scale={scale}
+          background={activeSlide.background.value}
+          pointerEvents={isTextTool ? "none" : "auto"}
         >
           {activeSlide.elements.map((el) => {
             if (el.type === "text") {
@@ -150,7 +144,7 @@ export function SlideCanvas() {
               }}
             />
           )}
-        </div>
+        </ScaledCanvas>
       </div>
     </div>
   );

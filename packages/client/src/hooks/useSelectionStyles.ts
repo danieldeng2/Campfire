@@ -4,17 +4,8 @@ import { MIXED } from "@/types/slides";
 import { useEditorStore } from "@/store/editorStore";
 import { getCharOffset } from "@/lib/domSelection";
 
-/** Pure function: resolves styles for a character range across runs */
-export function resolveStylesForRange(
-  element: TextElement,
-  start: number,
-  end: number
-): ResolvedStyles {
-  const base = element.style;
-  const runs = element.runs.length > 0 ? element.runs : [{ text: element.content, style: {} }];
-
-  // Collect values for each property across runs that overlap [start, end)
-  const sets: Record<keyof TextStyle, Set<string | number>> = {
+function createStyleSets(): Record<keyof TextStyle, Set<string | number>> {
+  return {
     fontSize: new Set(),
     fontWeight: new Set(),
     fontStyle: new Set(),
@@ -25,6 +16,19 @@ export function resolveStylesForRange(
     letterSpacing: new Set(),
     fontFamily: new Set(),
   };
+}
+
+/** Pure function: resolves styles for a character range across runs */
+export function resolveStylesForRange(
+  element: TextElement,
+  start: number,
+  end: number
+): ResolvedStyles {
+  const base = element.style;
+  const runs = element.runs.length > 0 ? element.runs : [{ text: element.content, style: {} }];
+
+  // Collect values for each property across runs that overlap [start, end)
+  const sets = createStyleSets();
 
   let pos = 0;
   for (const run of runs) {
@@ -80,17 +84,7 @@ export function resolveStylesForElements(elements: TextElement[]): ResolvedStyle
     return resolveStylesForRange(el, 0, el.content.length || 1);
   }
 
-  const sets: Record<keyof TextStyle, Set<string | number>> = {
-    fontSize: new Set(),
-    fontWeight: new Set(),
-    fontStyle: new Set(),
-    textDecoration: new Set(),
-    color: new Set(),
-    textAlign: new Set(),
-    lineHeight: new Set(),
-    letterSpacing: new Set(),
-    fontFamily: new Set(),
-  };
+  const sets = createStyleSets();
 
   for (const el of elements) {
     for (const key of Object.keys(sets) as (keyof TextStyle)[]) {
