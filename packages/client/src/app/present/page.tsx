@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSlidesStore } from "@/store/slidesStore";
+import { runsToHtml } from "@/lib/runsToHtml";
 import { PresentToolbar } from "@/components/present/PresentToolbar";
 import "reveal.js/dist/reveal.css";
 import "reveal.js/dist/theme/black.css";
@@ -112,9 +113,10 @@ export default function PresentPage() {
                       whiteSpace: "pre-wrap",
                       wordBreak: "break-word",
                     }}
-                  >
-                    {el.content}
-                  </div>
+                    dangerouslySetInnerHTML={{
+                      __html: runsToHtml(el.content, el.runs, el.style),
+                    }}
+                  />
                 );
               })}
             </section>

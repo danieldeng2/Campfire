@@ -1,12 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useLayoutEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { TextElement as TextElementType } from "@/types/slides";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { useDragElement } from "@/hooks/useDragElement";
 import { useTextEditing } from "@/hooks/useTextEditing";
+import { useSelectionStyles } from "@/hooks/useSelectionStyles";
+import { runsToHtml } from "@/lib/runsToHtml";
+import { restoreCharSelection } from "@/lib/domSelection";
 import { c } from "@/lib/colors";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 
@@ -17,11 +20,17 @@ interface Props {
 }
 
 export function TextElement({ element, slideId, scale }: Props) {
-  const { rect, style, content, id } = element;
+  const { rect, style, content, runs, id } = element;
   const contentRef = useRef<HTMLDivElement>(null);
+  const prevRunsRef = useRef(runs);
 
-  const { selectedElementIds, editingElementId, selectElements, setEditingElement } =
-    useEditorStore();
+  const {
+    selectedElementIds,
+    editingElementId,
+    selectionRange,
+    selectElements,
+    setEditingElement,
+  } = useEditorStore();
   const { updateElementRect, updateElementContent, deleteElement } = useSlidesStore();
 
   const isSelected = selectedElementIds.includes(id);
@@ -29,10 +38,15 @@ export function TextElement({ element, slideId, scale }: Props) {
 
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
 
+  // Updates selectionRange in editorStore on every selectionchange event while editing
+  useSelectionStyles(contentRef, isEditing, element);
+
   const { handleClick, handleDoubleClick, handleBlur, handleKeyDown } = useTextEditing({
     id,
     slideId,
     content,
+    runs,
+    style,
     isSelected,
     isEditing,
     contentRef,
@@ -47,6 +61,18 @@ export function TextElement({ element, slideId, scale }: Props) {
     onDragEnd: (newRect) => updateElementRect(slideId, id, newRect),
     enabled: !isEditing,
   });
+
+  // When runs change while already editing (style mutation from sidebar), update DOM and restore selection
+  useLayoutEffect(() => {
+    if (!isEditing || !contentRef.current) return;
+    if (runs === prevRunsRef.current) return;
+    prevRunsRef.current = runs;
+    contentRef.current.innerHTML = runsToHtml(content, runs, style);
+    if (selectionRange) {
+      contentRef.current.focus();
+      restoreCharSelection(contentRef.current, selectionRange.start, selectionRange.end);
+    }
+  }, [runs, isEditing, selectionRange, content, style]);
 
   return (
     <div
@@ -71,7 +97,13 @@ export function TextElement({ element, slideId, scale }: Props) {
         selectElements([id]);
         setCtxMenu({ x: e.clientX, y: e.clientY });
       }}
-      onPointerDown={onPointerDown}
+      onPointerDown={(e) => {
+        if (isEditing) {
+          e.stopPropagation();
+          return;
+        }
+        onPointerDown(e);
+      }}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
@@ -93,7 +125,7 @@ export function TextElement({ element, slideId, scale }: Props) {
           width: "100%",
           height: "100%",
           outline: "none",
-          pointerEvents: isEditing ? "auto" : "none",
+          userSelect: "text",
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
           overflow: "hidden",

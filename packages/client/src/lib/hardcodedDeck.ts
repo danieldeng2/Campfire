@@ -15,6 +15,7 @@ export const HARDCODED_DECK: Deck = {
           rect: { x: 160, y: 280, width: 1600, height: 220 },
           zIndex: 1,
           content: "Welcome to Campfire 🔥",
+          runs: [],
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 96,
@@ -32,6 +33,7 @@ export const HARDCODED_DECK: Deck = {
           rect: { x: 360, y: 530, width: 1200, height: 100 },
           zIndex: 2,
           content: "A WYSIWYG editor for reveal.js presentations",
+          runs: [],
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 36,
@@ -56,6 +58,7 @@ export const HARDCODED_DECK: Deck = {
           rect: { x: 160, y: 180, width: 1400, height: 160 },
           zIndex: 1,
           content: "Built for Creators",
+          runs: [],
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 80,
@@ -73,6 +76,7 @@ export const HARDCODED_DECK: Deck = {
           rect: { x: 160, y: 400, width: 1200, height: 300 },
           zIndex: 2,
           content: "Drag, drop, and edit your slides visually.\nNo code required.",
+          runs: [],
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 48,
@@ -97,6 +101,7 @@ export const HARDCODED_DECK: Deck = {
           rect: { x: 160, y: 380, width: 1600, height: 200 },
           zIndex: 1,
           content: "Start presenting today.",
+          runs: [],
           style: {
             fontFamily: "Inter, sans-serif",
             fontSize: 88,

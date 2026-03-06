@@ -96,6 +96,7 @@ export function useCanvasInteraction({
           },
           zIndex: activeSlide.elements.length + 1,
           content: "",
+          runs: [],
           style: DEFAULT_TEXT_STYLE,
         });
         setActiveTool(Tool.Move);

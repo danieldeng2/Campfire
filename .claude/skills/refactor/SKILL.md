@@ -13,6 +13,8 @@ Look through the existing code and perform the following refactors:
 
 4. **Folder organisation** — move related components into named subfolders (e.g. `components/UILibrary/`, `components/editor/elements/`). Reusable UI primitives belong in `UILibrary/`.
 
+5. **Dead code removal** — identify and remove unused code: unreachable branches (`if (false)`, conditions that can never be true), functions/variables/types that are defined but never imported or called, commented-out code blocks that are no longer relevant, and unused imports. Verify each deletion won't break anything before removing.
+
 After all changes:
 - Run `source ~/.zprofile && pnpm prettier --write <files>` on every modified file
 - Run `pnpm tsc --noEmit` to confirm no type errors

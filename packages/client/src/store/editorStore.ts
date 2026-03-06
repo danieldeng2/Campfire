@@ -6,10 +6,12 @@ interface EditorState {
   selectedElementIds: string[];
   editingElementId: string | null;
   activeTool: Tool;
+  selectionRange: { start: number; end: number } | null;
   setActiveSlide: (id: string) => void;
   selectElements: (ids: string[]) => void;
   setEditingElement: (id: string | null) => void;
   setActiveTool: (tool: Tool) => void;
+  setSelectionRange: (range: { start: number; end: number } | null) => void;
 }
 
 export const useEditorStore = create<EditorState>()((set) => ({
@@ -17,10 +19,18 @@ export const useEditorStore = create<EditorState>()((set) => ({
   selectedElementIds: [],
   editingElementId: null,
   activeTool: Tool.Move,
+  selectionRange: null,
   setActiveSlide: (id) =>
-    set({ activeSlideId: id, selectedElementIds: [], editingElementId: null }),
+    set({
+      activeSlideId: id,
+      selectedElementIds: [],
+      editingElementId: null,
+      selectionRange: null,
+    }),
   selectElements: (ids) => set({ selectedElementIds: ids }),
-  setEditingElement: (id) => set({ editingElementId: id }),
+  setEditingElement: (id) =>
+    set({ editingElementId: id, selectionRange: id === null ? null : undefined }),
   setActiveTool: (tool) =>
-    set({ activeTool: tool, selectedElementIds: [], editingElementId: null }),
+    set({ activeTool: tool, selectedElementIds: [], editingElementId: null, selectionRange: null }),
+  setSelectionRange: (range) => set({ selectionRange: range }),
 }));

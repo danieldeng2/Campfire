@@ -25,9 +25,29 @@ export interface BaseElement {
   zIndex: number;
 }
 
+export interface StyleRun {
+  text: string;
+  style: Partial<TextStyle>;
+}
+
+export const MIXED = "Mixed" as const;
+export type MixedValue = typeof MIXED;
+export type StyleValue<T> = T | MixedValue;
+
+export interface ResolvedStyles {
+  fontSize: StyleValue<number>;
+  fontWeight: StyleValue<number>;
+  fontStyle: StyleValue<"normal" | "italic">;
+  color: StyleValue<string>;
+  textAlign: StyleValue<"left" | "center" | "right">;
+  lineHeight: StyleValue<number>;
+  letterSpacing: StyleValue<number>;
+}
+
 export interface TextElement extends BaseElement {
   type: "text";
   content: string;
+  runs: StyleRun[];
   style: TextStyle;
 }
 

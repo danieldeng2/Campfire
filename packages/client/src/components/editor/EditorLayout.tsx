@@ -9,6 +9,7 @@ import { TopNav } from "./TopNav";
 import { Sidebar } from "./Sidebar";
 import { SlideCanvas } from "./SlideCanvas";
 import { ToolBar } from "./ToolBar";
+import { RightSidebar } from "./sidebar/RightSidebar";
 
 export function EditorLayout() {
   const slides = useSlidesStore((s) => s.deck.slides);
@@ -24,8 +25,10 @@ export function EditorLayout() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't handle shortcuts while typing in a text element
+      // Don't handle shortcuts while typing in a text element or sidebar input
       if (editingElementId) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       if (e.key === "v" || e.key === "V") {
         setActiveTool(Tool.Move);
@@ -96,6 +99,7 @@ export function EditorLayout() {
           <SlideCanvas />
           <ToolBar />
         </main>
+        <RightSidebar />
       </div>
     </div>
   );
