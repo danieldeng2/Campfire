@@ -8,9 +8,11 @@ import { useEditorStore } from "@/store/editorStore";
 import { useDragElement } from "@/hooks/useDragElement";
 import { useTextEditing } from "@/hooks/useTextEditing";
 import { useSelectionStyles } from "@/hooks/useSelectionStyles";
+import { useResizeElement } from "@/hooks/useResizeElement";
+import type { ResizeHandle } from "@/hooks/useResizeElement";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { restoreCharSelection } from "@/lib/domSelection";
-import { c } from "@/lib/colors";
+import { c, ink } from "@/lib/colors";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 
 interface Props {
@@ -18,6 +20,54 @@ interface Props {
   slideId: string;
   scale: number;
 }
+
+// Outline is 2px with outlineOffset 2px → outline center is 3px outside the element edge.
+// Handle is 12×12 → half = 6px. To center on the outline: -(outlineOffset + outlineWidth/2 + handleHalf) = -(2+1+6) = -9px.
+const HANDLE_SIZE = 12;
+const HANDLE_OFFSET = -9;
+
+const HANDLE_DEFS: { handle: ResizeHandle; style: React.CSSProperties }[] = [
+  { handle: "nw", style: { top: HANDLE_OFFSET, left: HANDLE_OFFSET, cursor: "nw-resize" } },
+  {
+    handle: "n",
+    style: {
+      top: HANDLE_OFFSET,
+      left: "50%",
+      transform: "translateX(-50%)",
+      cursor: "n-resize",
+    },
+  },
+  { handle: "ne", style: { top: HANDLE_OFFSET, right: HANDLE_OFFSET, cursor: "ne-resize" } },
+  {
+    handle: "e",
+    style: {
+      top: "50%",
+      right: HANDLE_OFFSET,
+      transform: "translateY(-50%)",
+      cursor: "e-resize",
+    },
+  },
+  { handle: "se", style: { bottom: HANDLE_OFFSET, right: HANDLE_OFFSET, cursor: "se-resize" } },
+  {
+    handle: "s",
+    style: {
+      bottom: HANDLE_OFFSET,
+      left: "50%",
+      transform: "translateX(-50%)",
+      cursor: "s-resize",
+    },
+  },
+  { handle: "sw", style: { bottom: HANDLE_OFFSET, left: HANDLE_OFFSET, cursor: "sw-resize" } },
+  {
+    handle: "w",
+    style: {
+      top: "50%",
+      left: HANDLE_OFFSET,
+      transform: "translateY(-50%)",
+      cursor: "w-resize",
+    },
+  },
+];
 
 export function TextElement({ element, slideId, scale }: Props) {
   const { rect, style, content, runs, id } = element;
@@ -60,6 +110,16 @@ export function TextElement({ element, slideId, scale }: Props) {
     scale,
     onDragEnd: (newRect) => updateElementRect(slideId, id, newRect),
     enabled: !isEditing,
+  });
+
+  const {
+    getHandlePointerDown,
+    onPointerMove: onResizeMove,
+    onPointerUp: onResizeUp,
+  } = useResizeElement({
+    rect,
+    scale,
+    onResize: (newRect) => updateElementRect(slideId, id, newRect),
   });
 
   // When runs change while already editing (style mutation from sidebar), update DOM and restore selection
@@ -128,9 +188,34 @@ export function TextElement({ element, slideId, scale }: Props) {
           userSelect: "text",
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
-          overflow: "hidden",
         }}
       />
+
+      {isSelected &&
+        !isEditing &&
+        HANDLE_DEFS.map(({ handle, style: posStyle }) => (
+          <div
+            key={handle}
+            style={{
+              position: "absolute",
+              width: HANDLE_SIZE,
+              height: HANDLE_SIZE,
+              borderRadius: 2,
+              background: c.surface,
+              border: `1.5px solid ${c.brand}`,
+              boxShadow: `0 0 0 1px ${ink(0.08)}`,
+              zIndex: 1,
+              ...posStyle,
+            }}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              getHandlePointerDown(handle)(e);
+            }}
+            onPointerMove={onResizeMove}
+            onPointerUp={onResizeUp}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ))}
 
       {ctxMenu && (
         <ContextMenu

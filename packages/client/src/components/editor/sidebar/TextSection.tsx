@@ -44,11 +44,21 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
     const targets = currentEditingId
       ? elements.filter((el) => el.id === currentEditingId)
       : elements;
+
+    // textAlign is a block-level property — always apply to the element, never to runs
+    const { textAlign, ...runPatch } = patch;
+    const hasRunPatch = Object.keys(runPatch).length > 0;
+
     for (const el of targets) {
-      if (currentRange && currentRange.start !== currentRange.end) {
-        updateElementStyleRange(activeSlideId, el.id, currentRange, patch);
-      } else {
-        updateElementStyle(activeSlideId, el.id, patch);
+      if (textAlign !== undefined) {
+        updateElementStyle(activeSlideId, el.id, { textAlign });
+      }
+      if (hasRunPatch) {
+        if (currentRange && currentRange.start !== currentRange.end) {
+          updateElementStyleRange(activeSlideId, el.id, currentRange, runPatch);
+        } else {
+          updateElementStyle(activeSlideId, el.id, runPatch);
+        }
       }
     }
   }
