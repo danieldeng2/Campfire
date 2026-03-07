@@ -103,6 +103,16 @@ export default function PresentPage() {
           {slides.map((slide) => (
             <section
               key={slide.id}
+              data-transition={
+                slide.transitionIn || slide.transitionOut
+                  ? [
+                      slide.transitionIn ? `${slide.transitionIn}-in` : "",
+                      slide.transitionOut ? `${slide.transitionOut}-out` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")
+                  : undefined
+              }
               style={{
                 backgroundColor: slide.background.value,
                 position: "relative",

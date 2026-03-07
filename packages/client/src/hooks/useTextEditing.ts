@@ -3,8 +3,7 @@ import type { StyleRun, TextStyle, TextElement } from "@/types/slides";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { useEditorStore } from "@/store/editorStore";
 import { domToRuns, getCharOffset, restoreCharSelection } from "@/lib/domSelection";
-import { resolveStylesForRange } from "@/hooks/useSelectionStyles";
-import { toggleUnderline, toggleStrikethrough } from "@/lib/textDecorationUtils";
+import { getFormattingPatch } from "@/lib/textFormatting";
 
 interface Options {
   id: string;
@@ -83,10 +82,6 @@ export function useTextEditing({
   const handleDoubleClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      // The inner div has userSelect:"text" so the browser performs native word selection.
-      // Capture offsets NOW (before selectElements/setEditingElement trigger a re-render that
-      // may clear the browser selection). Then restore after React paints via rAF — this works
-      // even when isEditing was already true (focus effect only fires on false→true transition).
       const sel = window.getSelection();
       let wordOffsets: { start: number; end: number } | null = null;
       if (sel && sel.rangeCount > 0 && contentRef.current) {
@@ -115,8 +110,6 @@ export function useTextEditing({
 
   const handleBlur = useCallback(
     (e: React.FocusEvent) => {
-      // If focus is moving into the sidebar, defer the blur so sidebar controls
-      // can read selectionRange and apply styles before edit mode exits.
       const relatedTarget = e.relatedTarget as HTMLElement | null;
       if (relatedTarget?.closest("[data-sidebar]")) return;
 
@@ -139,65 +132,20 @@ export function useTextEditing({
       const modKey = e.metaKey || e.ctrlKey;
       if (!modKey) return;
 
-      // Shared helpers for formatting shortcuts
-      function getResolved() {
-        const { selectionRange: currentRange } = useEditorStore.getState();
-        const resolveStart = currentRange?.start ?? 0;
-        const resolveEnd =
-          currentRange && currentRange.end > currentRange.start
-            ? currentRange.end
-            : resolveStart + 1;
-        const resolved = resolveStylesForRange(
-          { id, content, runs, style } as TextElement,
-          resolveStart,
-          resolveEnd
-        );
-        return { currentRange, resolved };
-      }
+      const { selectionRange: currentRange } = useEditorStore.getState();
+      const patch = getFormattingPatch(e.key, e.shiftKey, {
+        element: { id, content, runs, style } as TextElement,
+        selectionRange: currentRange,
+      });
 
-      function applyPatch(
-        patch: Partial<TextStyle>,
-        currentRange: { start: number; end: number } | null
-      ) {
-        if (currentRange && currentRange.start !== currentRange.end) {
-          // Flush live DOM content to store first so updateElementStyleRange sees the correct text
-          useEditorStore.getState().flushEditingContent?.();
-          updateElementStyleRange(slideId, id, currentRange, patch);
-        } else {
-          updateElementStyle(slideId, id, patch);
-        }
-      }
+      if (!patch) return;
+      e.preventDefault();
 
-      if (e.key === "b" || e.key === "B") {
-        e.preventDefault();
-        const { currentRange, resolved } = getResolved();
-        const isBold = typeof resolved.fontWeight === "number" && resolved.fontWeight >= 700;
-        applyPatch({ fontWeight: isBold ? 400 : 700 }, currentRange);
-        return;
-      }
-
-      if (e.key === "i" || e.key === "I") {
-        e.preventDefault();
-        const { currentRange, resolved } = getResolved();
-        const isItalic = resolved.fontStyle === "italic";
-        applyPatch({ fontStyle: isItalic ? "normal" : "italic" }, currentRange);
-        return;
-      }
-
-      if (!e.shiftKey && (e.key === "u" || e.key === "U")) {
-        e.preventDefault();
-        const { currentRange, resolved } = getResolved();
-        const cur = resolved.textDecoration === "Mixed" ? "none" : resolved.textDecoration;
-        applyPatch({ textDecoration: toggleUnderline(cur) }, currentRange);
-        return;
-      }
-
-      if (e.shiftKey && (e.key === "x" || e.key === "X")) {
-        e.preventDefault();
-        const { currentRange, resolved } = getResolved();
-        const cur = resolved.textDecoration === "Mixed" ? "none" : resolved.textDecoration;
-        applyPatch({ textDecoration: toggleStrikethrough(cur) }, currentRange);
-        return;
+      if (currentRange && currentRange.start !== currentRange.end) {
+        useEditorStore.getState().flushEditingContent?.();
+        updateElementStyleRange(slideId, id, currentRange, patch);
+      } else {
+        updateElementStyle(slideId, id, patch);
       }
     },
     [contentRef, id, slideId, content, runs, style, updateElementStyle, updateElementStyleRange]

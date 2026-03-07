@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Slide, SlideRect, SlideElement } from "@/types/slides";
 import { Tool } from "@/types/editor";
 import { DEFAULT_TEXT_STYLE } from "@/lib/defaultStyles";
-import { rectsOverlap } from "@/lib/geometry";
+import { rectsOverlap, toCanvasCoords } from "@/lib/geometry";
 
 const MIN_DRAW_SIZE = 20;
 const MIN_BAND_DRAG_PX = 5;
@@ -33,12 +33,8 @@ export function useCanvasInteraction({
   const [bandStart, setBandStart] = useState<{ x: number; y: number } | null>(null);
   const [bandRect, setBandRect] = useState<SlideRect | null>(null);
 
-  function toCanvasCoords(clientX: number, clientY: number) {
-    const bounds = wrapperRef.current!.getBoundingClientRect();
-    return {
-      x: (clientX - bounds.left) / scale,
-      y: (clientY - bounds.top) / scale,
-    };
+  function getCanvasCoords(clientX: number, clientY: number) {
+    return toCanvasCoords(clientX, clientY, wrapperRef.current!.getBoundingClientRect(), scale);
   }
 
   function handlePointerDown(e: React.PointerEvent) {
@@ -46,7 +42,7 @@ export function useCanvasInteraction({
 
     if (isTextTool) {
       e.preventDefault();
-      const pt = toCanvasCoords(e.clientX, e.clientY);
+      const pt = getCanvasCoords(e.clientX, e.clientY);
       setDrawStart(pt);
       setDrawRect({ x: pt.x, y: pt.y, width: 0, height: 0 });
     } else {
@@ -57,7 +53,7 @@ export function useCanvasInteraction({
 
   function handlePointerMove(e: React.PointerEvent) {
     if (drawStart) {
-      const pt = toCanvasCoords(e.clientX, e.clientY);
+      const pt = getCanvasCoords(e.clientX, e.clientY);
       setDrawRect({
         x: Math.min(drawStart.x, pt.x),
         y: Math.min(drawStart.y, pt.y),
@@ -68,8 +64,8 @@ export function useCanvasInteraction({
     }
 
     if (bandStart) {
-      const start = toCanvasCoords(bandStart.x, bandStart.y);
-      const current = toCanvasCoords(e.clientX, e.clientY);
+      const start = getCanvasCoords(bandStart.x, bandStart.y);
+      const current = getCanvasCoords(e.clientX, e.clientY);
       setBandRect({
         x: Math.min(start.x, current.x),
         y: Math.min(start.y, current.y),

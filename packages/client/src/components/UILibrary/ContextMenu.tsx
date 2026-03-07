@@ -73,8 +73,10 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
             color: item.disabled ? ink(0.3) : item.danger ? c.danger : c.ink,
           }}
           onMouseEnter={(e) => {
-            if (!item.disabled && item.danger)
-              (e.currentTarget as HTMLButtonElement).style.background = c.dangerBg;
+            if (!item.disabled)
+              (e.currentTarget as HTMLButtonElement).style.background = item.danger
+                ? c.dangerBg
+                : ink(0.06);
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.background = "none";

@@ -53,7 +53,7 @@ export function LayoutSection({ elements, activeSlideId }: Props) {
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <NumberInput
-          label="W"
+          label="Width"
           value={resolved.width}
           min={1}
           step={1}
@@ -61,7 +61,7 @@ export function LayoutSection({ elements, activeSlideId }: Props) {
           onChange={(v) => update("width", v)}
         />
         <NumberInput
-          label="H"
+          label="Height"
           value={resolved.height}
           min={1}
           step={1}

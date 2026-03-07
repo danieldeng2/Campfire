@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Copy, Plus, Trash2 } from "lucide-react";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { useSlideDrag } from "@/hooks/useSlideDrag";
@@ -25,6 +25,7 @@ export function Sidebar({ width }: SidebarProps) {
   const addSlide = useSlidesStore((s) => s.addSlide);
   const reorderSlide = useSlidesStore((s) => s.reorderSlide);
   const deleteSlide = useSlidesStore((s) => s.deleteSlide);
+  const duplicateSlide = useSlidesStore((s) => s.duplicateSlide);
   const { activeSlideId, setActiveSlide } = useEditorStore();
 
   const [contextMenu, setContextMenu] = useState<SlideContextMenu | null>(null);
@@ -123,6 +124,14 @@ export function Sidebar({ width }: SidebarProps) {
           y={contextMenu.y}
           onClose={() => setContextMenu(null)}
           items={[
+            {
+              label: "Duplicate",
+              icon: <Copy size={13} strokeWidth={1.5} />,
+              onClick: () => {
+                const newId = duplicateSlide(contextMenu.slideId);
+                setActiveSlide(newId);
+              },
+            },
             {
               label: "Delete",
               icon: <Trash2 size={13} strokeWidth={1.5} />,

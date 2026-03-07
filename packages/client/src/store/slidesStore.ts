@@ -7,6 +7,7 @@ import type {
   SlideBackground,
   SlideElement,
   SlideRect,
+  SlideTransition,
   StyleRun,
   TextStyle,
 } from "@/types/slides";
@@ -47,6 +48,7 @@ interface SlidesState {
   ) => void;
   updateTitle: (title: string) => void;
   addSlide: () => string; // returns the new slide's id
+  duplicateSlide: (slideId: string) => string; // returns the new slide's id
   reorderSlide: (fromIndex: number, toIndex: number) => void;
   deleteSlide: (slideId: string) => void;
   addElement: (slideId: string, element: SlideElement) => void;
@@ -55,6 +57,10 @@ interface SlidesState {
     slideId: string,
     elementId: string,
     patch: Partial<{ objectFit: ObjectFit; borderRadius: number }>
+  ) => void;
+  updateSlideTransition: (
+    slideId: string,
+    patch: { transitionIn?: SlideTransition; transitionOut?: SlideTransition }
   ) => void;
 }
 
@@ -173,6 +179,26 @@ export const useSlidesStore = create<SlidesState>()(
         const el = findImageEl(state, slideId, elementId);
         if (el) Object.assign(el, patch);
       }),
+
+    updateSlideTransition: (slideId, patch) =>
+      set((state) => {
+        const slide = state.deck.slides.find((s) => s.id === slideId);
+        if (slide) Object.assign(slide, patch);
+      }),
+
+    duplicateSlide: (slideId) => {
+      const id = crypto.randomUUID();
+      set((state) => {
+        const index = state.deck.slides.findIndex((s) => s.id === slideId);
+        if (index === -1) return;
+        const source = state.deck.slides[index];
+        const clone = JSON.parse(JSON.stringify(source));
+        clone.id = id;
+        for (const el of clone.elements) el.id = crypto.randomUUID();
+        state.deck.slides.splice(index + 1, 0, clone);
+      });
+      return id;
+    },
 
     addSlide: () => {
       const id = crypto.randomUUID();

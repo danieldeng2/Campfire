@@ -1,18 +1,17 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useCallback } from "react";
 import { useCanvasScale } from "@/hooks/useCanvasScale";
 import { useCanvasInteraction } from "@/hooks/useCanvasInteraction";
+import { useImagePlacement } from "@/hooks/useImagePlacement";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { Tool } from "@/types/editor";
 import { c } from "@/lib/colors";
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_CX, CANVAS_CY } from "@/lib/canvasConstants";
 import { TextElement } from "./elements/TextElement";
 import { ImageElement } from "./elements/ImageElement";
 import { ScaledCanvas } from "./ScaledCanvas";
-
-const PREVIEW_MAX_W = 200;
 
 export function SlideCanvas() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -35,9 +34,6 @@ export function SlideCanvas() {
   const isTextTool = activeTool === Tool.Text;
   const isImageTool = activeTool === Tool.Image;
 
-  // Track mouse position for image placement preview (in canvas coords)
-  const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
-
   const { drawRect, bandRect, handlePointerDown, handlePointerMove, handlePointerUp } =
     useCanvasInteraction({
       scale,
@@ -50,91 +46,36 @@ export function SlideCanvas() {
       setActiveTool,
     });
 
+  const { previewPos, previewW, previewH, trackPointer, placeImage } = useImagePlacement({
+    pendingImage,
+    scale,
+    wrapperRef,
+    activeSlide: activeSlide!,
+    addElement,
+    selectElements,
+    setPendingImage,
+  });
+
   const handleWrapperPointerMove = useCallback(
     (e: React.PointerEvent) => {
       handlePointerMove(e);
-      if (pendingImage && wrapperRef.current) {
-        const bounds = wrapperRef.current.getBoundingClientRect();
-        setPreviewPos({
-          x: (e.clientX - bounds.left) / scale,
-          y: (e.clientY - bounds.top) / scale,
-        });
-      }
+      trackPointer(e);
     },
-    [handlePointerMove, pendingImage, scale]
+    [handlePointerMove, trackPointer]
   );
 
   const handleWrapperPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (pendingImage && wrapperRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-        const bounds = wrapperRef.current.getBoundingClientRect();
-        const cx = (e.clientX - bounds.left) / scale;
-        const cy = (e.clientY - bounds.top) / scale;
-
-        // Compute element size: fit within canvas, max 50% of canvas width
-        const maxW = CANVAS_WIDTH * 0.5;
-        const ar = pendingImage.width / pendingImage.height;
-        let w = Math.min(pendingImage.width, maxW);
-        let h = w / ar;
-        if (h > CANVAS_HEIGHT * 0.5) {
-          h = CANVAS_HEIGHT * 0.5;
-          w = h * ar;
-        }
-
-        // Center the image on the click point, clamped to canvas
-        let x = cx - w / 2;
-        let y = cy - h / 2;
-        x = Math.max(0, Math.min(CANVAS_WIDTH - w, x));
-        y = Math.max(0, Math.min(CANVAS_HEIGHT - h, y));
-
-        const id = crypto.randomUUID();
-        addElement(activeSlide!.id, {
-          id,
-          type: "image",
-          rect: {
-            x: Math.round(x),
-            y: Math.round(y),
-            width: Math.round(w),
-            height: Math.round(h),
-          },
-          zIndex: activeSlide!.elements.length + 1,
-          src: pendingImage.src,
-          objectFit: "cover",
-          borderRadius: 12,
-        });
-        selectElements([id]);
-        setPendingImage(null);
-        setPreviewPos(null);
-        return;
-      }
+      if (placeImage(e)) return;
       handlePointerDown(e);
     },
-    [
-      pendingImage,
-      scale,
-      activeSlide,
-      addElement,
-      selectElements,
-      setPendingImage,
-      handlePointerDown,
-    ]
+    [placeImage, handlePointerDown]
   );
 
   if (!activeSlide) return null;
 
   const scaledWidth = CANVAS_WIDTH * scale;
   const scaledHeight = CANVAS_HEIGHT * scale;
-
-  // Preview dimensions for the pending image
-  let previewW = 0;
-  let previewH = 0;
-  if (pendingImage) {
-    const ar = pendingImage.width / pendingImage.height;
-    previewW = PREVIEW_MAX_W;
-    previewH = previewW / ar;
-  }
 
   return (
     <div
@@ -225,10 +166,10 @@ export function SlideCanvas() {
             <div
               style={{
                 position: "absolute",
-                left: 959,
+                left: CANVAS_CX - 1,
                 top: 0,
                 width: 2,
-                height: 1080,
+                height: CANVAS_HEIGHT,
                 backgroundColor: c.danger,
                 pointerEvents: "none",
               }}
@@ -239,8 +180,8 @@ export function SlideCanvas() {
               style={{
                 position: "absolute",
                 left: 0,
-                top: 539,
-                width: 1920,
+                top: CANVAS_CY - 1,
+                width: CANVAS_WIDTH,
                 height: 2,
                 backgroundColor: c.danger,
                 pointerEvents: "none",

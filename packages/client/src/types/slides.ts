@@ -64,6 +64,8 @@ export interface ImageElement extends BaseElement {
 
 export type SlideElement = TextElement | ImageElement;
 
+export type SlideTransition = "none" | "fade" | "slide" | "convex" | "concave" | "zoom";
+
 export interface SlideBackground {
   type: "color";
   value: string;
@@ -74,6 +76,8 @@ export interface Slide {
   background: SlideBackground;
   elements: SlideElement[];
   notes: string;
+  transitionIn?: SlideTransition;
+  transitionOut?: SlideTransition;
 }
 
 export interface Deck {

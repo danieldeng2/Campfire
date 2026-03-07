@@ -6,6 +6,7 @@ import type { TextElement, ImageElement, ResolvedStyles } from "@/types/slides";
 import { c } from "@/lib/colors";
 import { resolveStylesForRange, resolveStylesForElements } from "@/hooks/useSelectionStyles";
 import { PageSection } from "./PageSection";
+import { TransitionSection } from "./TransitionSection";
 import { TextSection } from "./TextSection";
 import { ImageSection } from "./ImageSection";
 import { LayoutSection } from "./LayoutSection";
@@ -58,6 +59,7 @@ export function RightSidebar({ width }: RightSidebarProps) {
       }}
     >
       {selectedElements.length === 0 && <PageSection slide={activeSlide} />}
+      {selectedElements.length === 0 && <TransitionSection slide={activeSlide} />}
       {allText && resolvedStyles && (
         <TextSection
           elements={selectedElements as TextElement[]}
