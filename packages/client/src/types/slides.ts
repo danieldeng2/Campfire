@@ -17,7 +17,9 @@ export interface TextStyle {
   letterSpacing: number;
 }
 
-export type ElementType = "text";
+export type ObjectFit = "contain" | "cover" | "fill" | "none" | "scale-down";
+
+export type ElementType = "text" | "image";
 
 export interface BaseElement {
   id: string;
@@ -53,7 +55,14 @@ export interface TextElement extends BaseElement {
   style: TextStyle;
 }
 
-export type SlideElement = TextElement;
+export interface ImageElement extends BaseElement {
+  type: "image";
+  src: string;
+  objectFit: ObjectFit;
+  borderRadius: number;
+}
+
+export type SlideElement = TextElement | ImageElement;
 
 export interface SlideBackground {
   type: "color";

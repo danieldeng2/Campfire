@@ -6,14 +6,13 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import { DropIndicator } from "./DragDrop";
 import { ScaledCanvas } from "./ScaledCanvas";
 
-export const THUMBNAIL_WIDTH = 176;
-const THUMBNAIL_SCALE = THUMBNAIL_WIDTH / CANVAS_WIDTH;
-const THUMBNAIL_HEIGHT = Math.round(CANVAS_HEIGHT * THUMBNAIL_SCALE);
+export const SIDEBAR_PADDING = 16;
 
 interface Props {
   slide: Slide;
   index: number;
   isActive: boolean;
+  thumbnailWidth: number;
   isDragging?: boolean;
   isDragOver?: boolean;
   onClick: () => void;
@@ -28,6 +27,7 @@ export function SlideThumbnail({
   slide,
   index,
   isActive,
+  thumbnailWidth,
   isDragging = false,
   isDragOver = false,
   onClick,
@@ -37,6 +37,8 @@ export function SlideThumbnail({
   onDrop,
   onDragEnd,
 }: Props) {
+  const thumbScale = thumbnailWidth / CANVAS_WIDTH;
+  const thumbHeight = Math.round(CANVAS_HEIGHT * thumbScale);
   return (
     <div
       draggable={!!onDragStart}
@@ -53,8 +55,8 @@ export function SlideThumbnail({
 
       <div
         style={{
-          width: THUMBNAIL_WIDTH,
-          height: THUMBNAIL_HEIGHT,
+          width: thumbnailWidth,
+          height: thumbHeight,
           position: "relative",
           overflow: "hidden",
           borderRadius: 4,
@@ -64,31 +66,52 @@ export function SlideThumbnail({
         }}
       >
         {/* Inner canvas scaled down */}
-        <ScaledCanvas scale={THUMBNAIL_SCALE} background={slide.background.value}>
+        <ScaledCanvas scale={thumbScale} background={slide.background.value}>
           {slide.elements.map((el) => {
-            if (el.type !== "text") return null;
-            return (
-              <div
-                key={el.id}
-                style={{
-                  position: "absolute",
-                  left: el.rect.x,
-                  top: el.rect.y,
-                  width: el.rect.width,
-                  height: el.rect.height,
-                  fontFamily: el.style.fontFamily,
-                  fontSize: el.style.fontSize,
-                  fontWeight: el.style.fontWeight,
-                  textDecoration: el.style.textDecoration,
-                  color: el.style.color,
-                  textAlign: el.style.textAlign,
-                  lineHeight: el.style.lineHeight,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {el.content}
-              </div>
-            );
+            if (el.type === "text") {
+              return (
+                <div
+                  key={el.id}
+                  style={{
+                    position: "absolute",
+                    left: el.rect.x,
+                    top: el.rect.y,
+                    width: el.rect.width,
+                    height: el.rect.height,
+                    fontFamily: el.style.fontFamily,
+                    fontSize: el.style.fontSize,
+                    fontWeight: el.style.fontWeight,
+                    textDecoration: el.style.textDecoration,
+                    color: el.style.color,
+                    textAlign: el.style.textAlign,
+                    lineHeight: el.style.lineHeight,
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {el.content}
+                </div>
+              );
+            }
+            if (el.type === "image") {
+              return (
+                <img
+                  key={el.id}
+                  src={el.src}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    left: el.rect.x,
+                    top: el.rect.y,
+                    width: el.rect.width,
+                    height: el.rect.height,
+                    objectFit: el.objectFit,
+                    borderRadius: el.borderRadius,
+                    pointerEvents: "none",
+                  }}
+                />
+              );
+            }
+            return null;
           })}
         </ScaledCanvas>
       </div>

@@ -117,7 +117,7 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
           </span>
           <div style={{ display: "flex", gap: 4 }}>
             <ToggleButton
-              icon={<Italic size={13} />}
+              icon={<Italic size={13} strokeWidth={1.5} />}
               active={isItalic}
               label="Italic"
               onClick={() =>
@@ -125,7 +125,7 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
               }
             />
             <ToggleButton
-              icon={<Underline size={13} />}
+              icon={<Underline size={13} strokeWidth={1.5} />}
               active={isUnderline}
               label="Underline"
               onClick={() => {
@@ -134,7 +134,7 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
               }}
             />
             <ToggleButton
-              icon={<Strikethrough size={13} />}
+              icon={<Strikethrough size={13} strokeWidth={1.5} />}
               active={isStrikethrough}
               label="Strikethrough"
               onClick={() => {
@@ -150,19 +150,19 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
           </span>
           <div style={{ display: "flex", gap: 4 }}>
             <ToggleButton
-              icon={<AlignLeft size={13} />}
+              icon={<AlignLeft size={13} strokeWidth={1.5} />}
               active={textAlign === "left" ? true : false}
               label="Align left"
               onClick={() => applyStyle({ textAlign: "left" })}
             />
             <ToggleButton
-              icon={<AlignCenter size={13} />}
+              icon={<AlignCenter size={13} strokeWidth={1.5} />}
               active={textAlign === "center" ? true : false}
               label="Align center"
               onClick={() => applyStyle({ textAlign: "center" })}
             />
             <ToggleButton
-              icon={<AlignRight size={13} />}
+              icon={<AlignRight size={13} strokeWidth={1.5} />}
               active={textAlign === "right" ? true : false}
               label="Align right"
               onClick={() => applyStyle({ textAlign: "right" })}

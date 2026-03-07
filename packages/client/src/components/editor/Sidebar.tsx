@@ -6,7 +6,7 @@ import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { useSlideDrag } from "@/hooks/useSlideDrag";
 import { c, ink } from "@/lib/colors";
-import { SlideThumbnail, THUMBNAIL_WIDTH } from "./SlideThumbnail";
+import { SlideThumbnail, SIDEBAR_PADDING } from "./SlideThumbnail";
 import { DropZone } from "./DragDrop";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 
@@ -16,7 +16,11 @@ interface SlideContextMenu {
   slideId: string;
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  width: number;
+}
+
+export function Sidebar({ width }: SidebarProps) {
   const slides = useSlidesStore((s) => s.deck.slides);
   const addSlide = useSlidesStore((s) => s.addSlide);
   const reorderSlide = useSlidesStore((s) => s.reorderSlide);
@@ -45,13 +49,14 @@ export function Sidebar() {
     }
   };
 
+  const thumbnailWidth = width - SIDEBAR_PADDING - 18;
+
   return (
     <aside
       className="flex flex-col shrink-0"
       style={{
-        width: 208,
+        width,
         background: c.surface,
-        borderRight: `1px solid ${ink(0.08)}`,
         paddingTop: 8,
       }}
     >
@@ -68,21 +73,21 @@ export function Sidebar() {
           style={{
             width: 22,
             height: 22,
-            color: ink(0.4),
+            color: ink(1),
             background: "transparent",
             border: "none",
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLButtonElement).style.background = ink(0.06);
-            (e.currentTarget as HTMLButtonElement).style.color = ink(0.7);
+            (e.currentTarget as HTMLButtonElement).style.color = ink(1);
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            (e.currentTarget as HTMLButtonElement).style.color = ink(0.4);
+            (e.currentTarget as HTMLButtonElement).style.color = ink(1);
           }}
         >
-          <Plus size={14} strokeWidth={2} />
+          <Plus size={14} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -97,6 +102,7 @@ export function Sidebar() {
             slide={slide}
             index={index}
             isActive={slide.id === activeSlideId}
+            thumbnailWidth={thumbnailWidth}
             isDragging={dragFromIndex === index}
             isDragOver={dragOverIndex === index && dragFromIndex !== index}
             onClick={() => setActiveSlide(slide.id)}
@@ -108,7 +114,7 @@ export function Sidebar() {
           />
         ))}
 
-        <DropZone width={THUMBNAIL_WIDTH} {...dropZoneProps} />
+        <DropZone width={thumbnailWidth} {...dropZoneProps} />
       </div>
 
       {contextMenu && (
@@ -119,7 +125,7 @@ export function Sidebar() {
           items={[
             {
               label: "Delete",
-              icon: <Trash2 size={13} />,
+              icon: <Trash2 size={13} strokeWidth={1.5} />,
               danger: true,
               disabled: slides.length <= 1,
               onClick: () => handleDelete(contextMenu.slideId),

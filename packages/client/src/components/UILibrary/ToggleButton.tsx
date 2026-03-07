@@ -39,7 +39,7 @@ export function ToggleButton({ icon, active, label, onClick }: Props) {
             : hovered
               ? ink(0.05)
               : "transparent",
-        color: isActive ? c.brand : isMixed ? ink(0.3) : ink(0.55),
+        color: isActive ? c.brand : isMixed ? ink(0.5) : ink(1),
         transition: "background 0.1s, color 0.1s",
         flexShrink: 0,
       }}

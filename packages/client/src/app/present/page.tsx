@@ -111,33 +111,53 @@ export default function PresentPage() {
               }}
             >
               {slide.elements.map((el) => {
-                if (el.type !== "text") return null;
-                return (
-                  <div
-                    key={el.id}
-                    style={{
-                      position: "absolute",
-                      left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
-                      top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
-                      width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
-                      height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
-                      fontFamily: el.style.fontFamily,
-                      fontSize: `${(el.style.fontSize / CANVAS_HEIGHT) * 100}vh`,
-                      fontWeight: el.style.fontWeight,
-                      fontStyle: el.style.fontStyle,
-                      textDecoration: el.style.textDecoration,
-                      color: el.style.color,
-                      textAlign: el.style.textAlign,
-                      lineHeight: el.style.lineHeight,
-                      letterSpacing: `${el.style.letterSpacing / CANVAS_HEIGHT}em`,
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html: runsToHtml(el.content, el.runs, el.style),
-                    }}
-                  />
-                );
+                if (el.type === "text") {
+                  return (
+                    <div
+                      key={el.id}
+                      style={{
+                        position: "absolute",
+                        left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
+                        top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
+                        width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
+                        height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
+                        fontFamily: el.style.fontFamily,
+                        fontSize: `${(el.style.fontSize / CANVAS_HEIGHT) * 100}vh`,
+                        fontWeight: el.style.fontWeight,
+                        fontStyle: el.style.fontStyle,
+                        textDecoration: el.style.textDecoration,
+                        color: el.style.color,
+                        textAlign: el.style.textAlign,
+                        lineHeight: el.style.lineHeight,
+                        letterSpacing: `${el.style.letterSpacing / CANVAS_HEIGHT}em`,
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: runsToHtml(el.content, el.runs, el.style),
+                      }}
+                    />
+                  );
+                }
+                if (el.type === "image") {
+                  return (
+                    <img
+                      key={el.id}
+                      src={el.src}
+                      alt=""
+                      style={{
+                        position: "absolute",
+                        left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
+                        top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
+                        width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
+                        height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
+                        objectFit: el.objectFit,
+                        borderRadius: el.borderRadius,
+                      }}
+                    />
+                  );
+                }
+                return null;
               })}
             </section>
           ))}

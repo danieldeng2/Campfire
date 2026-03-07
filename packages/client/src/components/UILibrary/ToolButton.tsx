@@ -30,7 +30,7 @@ export function ToolButton({ icon, label, shortcut, active, onClick }: ToolButto
           borderRadius: 8,
           cursor: "pointer",
           background: active ? c.brand : hovered ? ink(0.05) : "transparent",
-          color: active ? "#ffffff" : ink(0.5),
+          color: active ? "#ffffff" : ink(1),
           transition: "background 0.1s, color 0.1s",
         }}
       >

@@ -99,7 +99,7 @@ export function TopNav() {
           (e.currentTarget as HTMLButtonElement).style.background = c.brand;
         }}
       >
-        <Play size={14} />
+        <Play size={14} strokeWidth={1.5} />
         Present
       </button>
     </header>

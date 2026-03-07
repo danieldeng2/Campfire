@@ -28,12 +28,25 @@ export function useEditorKeyboardShortcuts() {
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
+      if (e.key === "Escape") {
+        const { pendingImage, setPendingImage } = useEditorStore.getState();
+        if (pendingImage) {
+          setPendingImage(null);
+          return;
+        }
+      }
+
       if (e.key === "v" || e.key === "V") {
         setActiveTool(Tool.Move);
         return;
       }
       if (e.key === "t" || e.key === "T") {
         setActiveTool(Tool.Text);
+        return;
+      }
+      if (e.key === "i" || e.key === "I") {
+        e.preventDefault();
+        document.dispatchEvent(new CustomEvent("campfire:open-image-picker"));
         return;
       }
 

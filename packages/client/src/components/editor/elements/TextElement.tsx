@@ -200,7 +200,7 @@ export function TextElement({ element, slideId, scale }: Props) {
           items={[
             {
               label: "Delete",
-              icon: <Trash2 size={13} />,
+              icon: <Trash2 size={13} strokeWidth={1.5} />,
               danger: true,
               onClick: () => {
                 deleteElement(slideId, id);

@@ -10,6 +10,8 @@ interface EditorState {
   snapLines: { showH: boolean; showV: boolean };
   /** Flushes unsaved DOM content to the store. Registered by TextElement while editing. */
   flushEditingContent: (() => void) | null;
+  /** Image waiting to be placed on the canvas. */
+  pendingImage: { src: string; width: number; height: number } | null;
   setActiveSlide: (id: string) => void;
   selectElements: (ids: string[]) => void;
   setEditingElement: (id: string | null) => void;
@@ -17,6 +19,7 @@ interface EditorState {
   setSelectionRange: (range: { start: number; end: number } | null) => void;
   setSnapLines: (snap: { showH: boolean; showV: boolean }) => void;
   setFlushEditingContent: (fn: (() => void) | null) => void;
+  setPendingImage: (img: { src: string; width: number; height: number } | null) => void;
 }
 
 export const useEditorStore = create<EditorState>()((set) => ({
@@ -42,4 +45,17 @@ export const useEditorStore = create<EditorState>()((set) => ({
   setSelectionRange: (range) => set({ selectionRange: range }),
   setSnapLines: (snap) => set({ snapLines: snap }),
   setFlushEditingContent: (fn) => set({ flushEditingContent: fn }),
+  pendingImage: null,
+  setPendingImage: (img) =>
+    set(
+      img
+        ? {
+            pendingImage: img,
+            activeTool: Tool.Image,
+            selectedElementIds: [],
+            editingElementId: null,
+            selectionRange: null,
+          }
+        : { pendingImage: null, activeTool: Tool.Move }
+    ),
 }));

@@ -3,6 +3,7 @@ import { immer } from "zustand/middleware/immer";
 import { arrayMoveImmutable } from "array-move";
 import type {
   Deck,
+  ObjectFit,
   SlideBackground,
   SlideElement,
   SlideRect,
@@ -21,6 +22,10 @@ function findEl(state: { deck: Deck }, slideId: string, elementId: string) {
 function findTextEl(state: { deck: Deck }, slideId: string, elementId: string) {
   const el = findEl(state, slideId, elementId);
   return el?.type === "text" ? el : null;
+}
+function findImageEl(state: { deck: Deck }, slideId: string, elementId: string) {
+  const el = findEl(state, slideId, elementId);
+  return el?.type === "image" ? el : null;
 }
 
 interface SlidesState {
@@ -46,6 +51,11 @@ interface SlidesState {
   deleteSlide: (slideId: string) => void;
   addElement: (slideId: string, element: SlideElement) => void;
   deleteElement: (slideId: string, elementId: string) => void;
+  updateImageStyle: (
+    slideId: string,
+    elementId: string,
+    patch: Partial<{ objectFit: ObjectFit; borderRadius: number }>
+  ) => void;
 }
 
 export const useSlidesStore = create<SlidesState>()(
@@ -156,6 +166,12 @@ export const useSlidesStore = create<SlidesState>()(
       set((state) => {
         const slide = state.deck.slides.find((s) => s.id === slideId);
         if (slide) slide.elements = slide.elements.filter((e) => e.id !== elementId);
+      }),
+
+    updateImageStyle: (slideId, elementId, patch) =>
+      set((state) => {
+        const el = findImageEl(state, slideId, elementId);
+        if (el) Object.assign(el, patch);
       }),
 
     addSlide: () => {

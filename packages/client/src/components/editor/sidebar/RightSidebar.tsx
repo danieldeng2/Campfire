@@ -2,13 +2,19 @@
 
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
-import type { TextElement, ResolvedStyles } from "@/types/slides";
-import { c, ink } from "@/lib/colors";
+import type { TextElement, ImageElement, ResolvedStyles } from "@/types/slides";
+import { c } from "@/lib/colors";
 import { resolveStylesForRange, resolveStylesForElements } from "@/hooks/useSelectionStyles";
 import { PageSection } from "./PageSection";
 import { TextSection } from "./TextSection";
+import { ImageSection } from "./ImageSection";
+import { LayoutSection } from "./LayoutSection";
 
-export function RightSidebar() {
+interface RightSidebarProps {
+  width: number;
+}
+
+export function RightSidebar({ width }: RightSidebarProps) {
   const { activeSlideId, selectedElementIds, editingElementId, selectionRange } = useEditorStore();
   const slides = useSlidesStore((s) => s.deck.slides);
 
@@ -16,6 +22,7 @@ export function RightSidebar() {
   const allElements = activeSlide?.elements ?? [];
   const selectedElements = allElements.filter((e) => selectedElementIds.includes(e.id));
   const allText = selectedElements.length > 0 && selectedElements.every((e) => e.type === "text");
+  const allImage = selectedElements.length > 0 && selectedElements.every((e) => e.type === "image");
 
   // Compute resolved styles
   let resolvedStyles: ResolvedStyles | null = null;
@@ -42,10 +49,9 @@ export function RightSidebar() {
     <aside
       data-sidebar=""
       style={{
-        width: 240,
+        width,
         flexShrink: 0,
         background: c.surface,
-        borderLeft: `1px solid ${ink(0.08)}`,
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
@@ -58,6 +64,15 @@ export function RightSidebar() {
           resolvedStyles={resolvedStyles}
           activeSlideId={activeSlideId!}
         />
+      )}
+      {allImage && (
+        <ImageSection
+          elements={selectedElements as ImageElement[]}
+          activeSlideId={activeSlideId!}
+        />
+      )}
+      {selectedElements.length > 0 && (
+        <LayoutSection elements={selectedElements} activeSlideId={activeSlideId!} />
       )}
     </aside>
   );
