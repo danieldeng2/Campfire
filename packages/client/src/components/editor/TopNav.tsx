@@ -4,12 +4,15 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Play } from "lucide-react";
 import { useSlidesStore } from "@/store/slidesStore";
+import { useEditorStore } from "@/store/editorStore";
 import { CampfireIcon } from "@/components/UILibrary/CampfireIcon";
 import { c, ink } from "@/lib/colors";
 
 export function TopNav() {
   const title = useSlidesStore((s) => s.deck.title);
+  const slides = useSlidesStore((s) => s.deck.slides);
   const updateTitle = useSlidesStore((s) => s.updateTitle);
+  const activeSlideId = useEditorStore((s) => s.activeSlideId);
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +80,10 @@ export function TopNav() {
       </div>
 
       <button
-        onClick={() => router.push("/present")}
+        onClick={() => {
+          const idx = slides.findIndex((s) => s.id === activeSlideId);
+          router.push(`/present${idx > 0 ? `?slide=${idx}` : ""}`);
+        }}
         className="flex items-center gap-2 text-sm font-semibold px-4 rounded-md transition-all"
         style={{
           height: 32,

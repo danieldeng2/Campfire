@@ -5,9 +5,13 @@ import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { Tool } from "@/types/editor";
 
+const ARROW_MOVE_STEP = 1;
+const ARROW_MOVE_STEP_LARGE = 10;
+
 export function useEditorKeyboardShortcuts() {
   const slides = useSlidesStore((s) => s.deck.slides);
   const deleteElement = useSlidesStore((s) => s.deleteElement);
+  const updateElementRect = useSlidesStore((s) => s.updateElementRect);
   const {
     activeSlideId,
     editingElementId,
@@ -50,6 +54,28 @@ export function useEditorKeyboardShortcuts() {
         return;
       }
 
+      const isArrow = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key);
+      if (!isArrow) return;
+
+      if (selectedElementIds.length > 0 && activeSlideId) {
+        e.preventDefault();
+        const step = e.shiftKey ? ARROW_MOVE_STEP_LARGE : ARROW_MOVE_STEP;
+        const dx = e.key === "ArrowLeft" ? -step : e.key === "ArrowRight" ? step : 0;
+        const dy = e.key === "ArrowUp" ? -step : e.key === "ArrowDown" ? step : 0;
+        const slide = slides.find((s) => s.id === activeSlideId);
+        if (!slide) return;
+        for (const id of selectedElementIds) {
+          const el = slide.elements.find((el) => el.id === id);
+          if (!el) continue;
+          updateElementRect(activeSlideId, id, {
+            ...el.rect,
+            x: el.rect.x + dx,
+            y: el.rect.y + dy,
+          });
+        }
+        return;
+      }
+
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
 
       const currentIndex = slides.findIndex((s) => s.id === activeSlideId);
@@ -74,6 +100,7 @@ export function useEditorKeyboardShortcuts() {
     selectedElementIds,
     selectElements,
     deleteElement,
+    updateElementRect,
     setActiveSlide,
     setActiveTool,
   ]);

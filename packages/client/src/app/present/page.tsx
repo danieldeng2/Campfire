@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSlidesStore } from "@/store/slidesStore";
+import { useEditorStore } from "@/store/editorStore";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { PresentToolbar } from "@/components/present/PresentToolbar";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
@@ -12,9 +13,15 @@ import "reveal.js/dist/theme/black.css";
 export default function PresentPage() {
   const deckRef = useRef<HTMLDivElement>(null);
   const slides = useSlidesStore((s) => s.deck.slides);
+  const setActiveSlide = useEditorStore((s) => s.setActiveSlide);
+  const searchParams = useSearchParams();
+  const startSlide = Number(searchParams.get("slide") ?? 0);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const revealInstance = useRef<any>(null);
   const router = useRouter();
+
+  const slidesRef = useRef(slides);
+  slidesRef.current = slides;
 
   const [showToolbar, setShowToolbar] = useState(false);
   const [slideIndex, setSlideIndex] = useState({ current: 1, total: slides.length });
@@ -36,6 +43,10 @@ export default function PresentPage() {
     // browser-native Escape and any programmatic exitFullscreen call)
     const handleFullscreenChange = () => {
       if (!document.fullscreenElement) {
+        // Sync current slide back to editor before navigating
+        const idx = revealInstance.current?.getState?.()?.indexh;
+        const slideId = slidesRef.current[idx ?? 0]?.id;
+        if (slideId) setActiveSlide(slideId);
         router.push("/editor");
       }
     };
@@ -56,9 +67,16 @@ export default function PresentPage() {
       });
       await revealInstance.current.initialize();
 
+      if (startSlide > 0) {
+        revealInstance.current.slide(startSlide);
+      }
+      setSlideIndex({ current: (startSlide || 0) + 1, total: slidesRef.current.length });
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       revealInstance.current.on("slidechanged", (event: any) => {
-        setSlideIndex({ current: event.indexh + 1, total: slides.length });
+        setSlideIndex({ current: event.indexh + 1, total: slidesRef.current.length });
+        const slideId = slidesRef.current[event.indexh]?.id;
+        if (slideId) setActiveSlide(slideId);
       });
     });
 
@@ -72,7 +90,7 @@ export default function PresentPage() {
         revealInstance.current = null;
       }
     };
-  }, [router, slides.length]);
+  }, [router, startSlide, setActiveSlide]);
 
   return (
     <div
