@@ -1,17 +1,18 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { useRef, useLayoutEffect, useCallback, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { TextElement as TextElementType } from "@/types/slides";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { useDragElement } from "@/hooks/useDragElement";
+import { useContextMenu } from "@/hooks/useContextMenu";
 import { useTextEditing } from "@/hooks/useTextEditing";
 import { useSelectionStyles } from "@/hooks/useSelectionStyles";
 import { useResizeElement } from "@/hooks/useResizeElement";
 import { runsToHtml } from "@/lib/runsToHtml";
 import { domToRuns, restoreCharSelection } from "@/lib/domSelection";
-import { c } from "@/lib/colors";
+import { selectionOutline } from "@/lib/elementStyles";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
 import { SelectionBox } from "./SelectionBox";
 
@@ -51,7 +52,7 @@ export function TextElement({ element, slideId, scale }: Props) {
   const isSelected = selectedElementIds.includes(id);
   const isEditing = editingElementId === id;
 
-  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
+  const { ctxMenu, openContextMenu, closeContextMenu } = useContextMenu();
 
   // Updates selectionRange in editorStore on every selectionchange event while editing
   useSelectionStyles(contentRef, isEditing, element);
@@ -128,10 +129,9 @@ export function TextElement({ element, slideId, scale }: Props) {
         top: rect.y,
         width: rect.width,
         height: rect.height,
-        zIndex: element.zIndex,
+        zIndex: isSelected ? 9998 : element.zIndex,
         cursor: isEditing ? "text" : isSelected ? "move" : "default",
-        outline: isSelected ? `2px solid ${c.brand}` : "2px solid transparent",
-        outlineOffset: "2px",
+        ...selectionOutline(isSelected),
         userSelect: isEditing ? "text" : "none",
         borderRadius: 2,
       }}
@@ -144,10 +144,8 @@ export function TextElement({ element, slideId, scale }: Props) {
       }}
       onDoubleClick={handleDoubleClick}
       onContextMenu={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
         selectElements([id]);
-        setCtxMenu({ x: e.clientX, y: e.clientY });
+        openContextMenu(e);
       }}
       onPointerDown={(e) => {
         if (isEditing) {
@@ -196,7 +194,7 @@ export function TextElement({ element, slideId, scale }: Props) {
         <ContextMenu
           x={ctxMenu.x}
           y={ctxMenu.y}
-          onClose={() => setCtxMenu(null)}
+          onClose={closeContextMenu}
           items={[
             {
               label: "Delete",

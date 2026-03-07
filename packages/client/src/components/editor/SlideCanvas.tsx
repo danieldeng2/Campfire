@@ -8,7 +8,8 @@ import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
 import { Tool } from "@/types/editor";
 import { c } from "@/lib/colors";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_CX, CANVAS_CY } from "@/lib/canvasConstants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
+import { SnapLines, RubberBand } from "./CanvasOverlays";
 import { TextElement } from "./elements/TextElement";
 import { ImageElement } from "./elements/ImageElement";
 import { ScaledCanvas } from "./ScaledCanvas";
@@ -168,50 +169,8 @@ export function SlideCanvas() {
             />
           )}
 
-          {/* Center snap lines */}
-          {snapLines.showV && (
-            <div
-              style={{
-                position: "absolute",
-                left: CANVAS_CX - 1,
-                top: 0,
-                width: 2,
-                height: CANVAS_HEIGHT,
-                backgroundColor: c.danger,
-                pointerEvents: "none",
-              }}
-            />
-          )}
-          {snapLines.showH && (
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                top: CANVAS_CY - 1,
-                width: CANVAS_WIDTH,
-                height: 2,
-                backgroundColor: c.danger,
-                pointerEvents: "none",
-              }}
-            />
-          )}
-
-          {/* Rubber-band selection */}
-          {bandRect && bandRect.width > 2 && bandRect.height > 2 && (
-            <div
-              style={{
-                position: "absolute",
-                left: bandRect.x,
-                top: bandRect.y,
-                width: bandRect.width,
-                height: bandRect.height,
-                border: `1px solid ${c.brand}`,
-                background: c.brandGhost,
-                pointerEvents: "none",
-                borderRadius: 2,
-              }}
-            />
-          )}
+          <SnapLines showV={snapLines.showV} showH={snapLines.showH} />
+          <RubberBand rect={bandRect} />
         </ScaledCanvas>
       </div>
     </div>

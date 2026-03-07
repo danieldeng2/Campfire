@@ -1,15 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Trash2 } from "lucide-react";
 import type { ImageElement as ImageElementType } from "@/types/slides";
 import { useEditorStore } from "@/store/editorStore";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useDragElement } from "@/hooks/useDragElement";
+import { useContextMenu } from "@/hooks/useContextMenu";
 import { useResizeElement } from "@/hooks/useResizeElement";
 import { SelectionBox } from "./SelectionBox";
 import { ContextMenu } from "@/components/UILibrary/ContextMenu";
-import { c } from "@/lib/colors";
+import { selectionOutline } from "@/lib/elementStyles";
 
 interface Props {
   element: ImageElementType;
@@ -19,7 +20,7 @@ interface Props {
 
 export function ImageElement({ element, slideId, scale }: Props) {
   const { rect, id, objectFit, borderRadius } = element;
-  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number } | null>(null);
+  const { ctxMenu, openContextMenu, closeContextMenu } = useContextMenu();
 
   const { selectedElementIds, selectElements, setEditingElement } = useEditorStore();
   const updateElementRect = useSlidesStore((s) => s.updateElementRect);
@@ -51,18 +52,15 @@ export function ImageElement({ element, slideId, scale }: Props) {
     aspectRatio,
   });
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (didDrag.current) {
-        clearDidDrag();
-        return;
-      }
-      selectElements([id]);
-      setEditingElement(null);
-    },
-    [id, selectElements, setEditingElement, didDrag, clearDidDrag]
-  );
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (didDrag.current) {
+      clearDidDrag();
+      return;
+    }
+    selectElements([id]);
+    setEditingElement(null);
+  };
 
   return (
     <div
@@ -72,17 +70,15 @@ export function ImageElement({ element, slideId, scale }: Props) {
         top: rect.y,
         width: rect.width,
         height: rect.height,
-        zIndex: element.zIndex,
+        zIndex: isSelected ? 9998 : element.zIndex,
         cursor: isSelected ? "move" : "default",
-        outline: isSelected ? `2px solid ${c.brand}` : "2px solid transparent",
-        outlineOffset: "2px",
+        ...selectionOutline(isSelected),
         userSelect: "none",
       }}
       onClick={handleClick}
       onContextMenu={(e) => {
-        e.preventDefault();
         selectElements([id]);
-        setCtxMenu({ x: e.clientX, y: e.clientY });
+        openContextMenu(e);
       }}
       onPointerDown={(e) => {
         e.preventDefault();
@@ -128,7 +124,7 @@ export function ImageElement({ element, slideId, scale }: Props) {
               },
             },
           ]}
-          onClose={() => setCtxMenu(null)}
+          onClose={closeContextMenu}
         />
       )}
     </div>
