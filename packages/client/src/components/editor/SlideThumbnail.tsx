@@ -48,8 +48,15 @@ export function SlideThumbnail({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className="flex flex-col gap-1.5 cursor-pointer"
-      style={{ userSelect: "none", opacity: isDragging ? 0.4 : 1, position: "relative" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        cursor: "pointer",
+        userSelect: "none",
+        opacity: isDragging ? 0.4 : 1,
+        position: "relative",
+      }}
     >
       {isDragOver && <DropIndicator offset={-10} />}
 
@@ -115,7 +122,7 @@ export function SlideThumbnail({
           })}
         </ScaledCanvas>
       </div>
-      <span className="text-xs text-center" style={{ color: isActive ? c.brand : ink(0.35) }}>
+      <span style={{ fontSize: 12, textAlign: "center", color: isActive ? c.brand : ink(0.35) }}>
         {index + 1}
       </span>
     </div>

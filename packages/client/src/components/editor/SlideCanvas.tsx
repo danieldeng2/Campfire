@@ -80,7 +80,14 @@ export function SlideCanvas() {
   return (
     <div
       ref={containerRef}
-      className="flex-1 flex items-center justify-center w-full h-full"
+      style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           selectElements([]);

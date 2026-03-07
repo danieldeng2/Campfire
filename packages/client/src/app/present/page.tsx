@@ -8,7 +8,6 @@ import { runsToHtml } from "@/lib/runsToHtml";
 import { PresentToolbar } from "@/components/present/PresentToolbar";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import "reveal.js/dist/reveal.css";
-import "reveal.js/dist/theme/black.css";
 
 export default function PresentPage() {
   const deckRef = useRef<HTMLDivElement>(null);
@@ -58,9 +57,9 @@ export default function PresentPage() {
       revealInstance.current = new Reveal(deckRef.current, {
         controls: false,
         progress: false,
-        center: true,
+        center: false,
         hash: false,
-        transition: "slide",
+        transition: "none",
         width: CANVAS_WIDTH,
         height: CANVAS_HEIGHT,
         margin: 0,
@@ -115,9 +114,6 @@ export default function PresentPage() {
               }
               style={{
                 backgroundColor: slide.background.value,
-                position: "relative",
-                width: "100%",
-                height: "100%",
               }}
             >
               {slide.elements.map((el) => {
@@ -127,19 +123,19 @@ export default function PresentPage() {
                       key={el.id}
                       style={{
                         position: "absolute",
-                        left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
-                        top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
-                        width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
-                        height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
+                        left: el.rect.x,
+                        top: el.rect.y,
+                        width: el.rect.width,
+                        height: el.rect.height,
                         fontFamily: el.style.fontFamily,
-                        fontSize: `${(el.style.fontSize / CANVAS_HEIGHT) * 100}vh`,
+                        fontSize: el.style.fontSize,
                         fontWeight: el.style.fontWeight,
                         fontStyle: el.style.fontStyle,
                         textDecoration: el.style.textDecoration,
                         color: el.style.color,
                         textAlign: el.style.textAlign,
                         lineHeight: el.style.lineHeight,
-                        letterSpacing: `${el.style.letterSpacing / CANVAS_HEIGHT}em`,
+                        letterSpacing: el.style.letterSpacing,
                         whiteSpace: "pre-wrap",
                         wordBreak: "break-word",
                       }}
@@ -157,10 +153,10 @@ export default function PresentPage() {
                       alt=""
                       style={{
                         position: "absolute",
-                        left: `${(el.rect.x / CANVAS_WIDTH) * 100}%`,
-                        top: `${(el.rect.y / CANVAS_HEIGHT) * 100}%`,
-                        width: `${(el.rect.width / CANVAS_WIDTH) * 100}%`,
-                        height: `${(el.rect.height / CANVAS_HEIGHT) * 100}%`,
+                        left: el.rect.x,
+                        top: el.rect.y,
+                        width: el.rect.width,
+                        height: el.rect.height,
                         objectFit: el.objectFit,
                         borderRadius: el.borderRadius,
                       }}

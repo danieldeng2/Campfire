@@ -1,117 +1,48 @@
-import colors from "tailwindcss/colors";
+import mc from "material-colors";
+
+// Pick 7 evenly-spaced shades from Material's shade scale
+const pick = (shade: Record<string, string>): string[] => [
+  shade["50"],
+  shade["100"],
+  shade["300"],
+  shade["400"],
+  shade["600"],
+  shade["700"],
+  shade["900"],
+];
 
 // Columns = hue families, rows = shades light → dark
 export const COLOR_COLUMNS: string[][] = [
   // Neutrals
   [
-    "#ffffff",
-    colors.neutral[200],
-    colors.neutral[400],
-    colors.neutral[500],
-    colors.neutral[700],
-    colors.neutral[900],
-    "#000000",
+    mc.white,
+    mc.grey["200"],
+    mc.grey["400"],
+    mc.grey["500"],
+    mc.grey["700"],
+    mc.grey["800"],
+    mc.black,
   ],
   // Red
-  [
-    colors.red[100],
-    colors.red[200],
-    colors.red[300],
-    colors.red[400],
-    colors.red[500],
-    colors.red[700],
-    colors.red[900],
-  ],
+  pick(mc.red),
+  // Deep Orange
+  pick(mc.deepOrange),
   // Orange
-  [
-    colors.orange[100],
-    colors.orange[200],
-    colors.orange[300],
-    colors.orange[400],
-    colors.orange[500],
-    colors.orange[700],
-    colors.orange[900],
-  ],
+  pick(mc.orange),
   // Amber
-  [
-    colors.amber[100],
-    colors.amber[200],
-    colors.amber[300],
-    colors.amber[400],
-    colors.amber[500],
-    colors.amber[700],
-    colors.amber[900],
-  ],
+  pick(mc.amber),
   // Yellow
-  [
-    colors.yellow[100],
-    colors.yellow[200],
-    colors.yellow[300],
-    colors.yellow[400],
-    colors.yellow[500],
-    colors.yellow[700],
-    colors.yellow[900],
-  ],
-  // Lime
-  [
-    colors.lime[100],
-    colors.lime[200],
-    colors.lime[300],
-    colors.lime[400],
-    colors.lime[500],
-    colors.lime[700],
-    colors.lime[900],
-  ],
+  pick(mc.yellow),
   // Green
-  [
-    colors.green[100],
-    colors.green[200],
-    colors.green[300],
-    colors.green[400],
-    colors.green[500],
-    colors.green[700],
-    colors.green[900],
-  ],
+  pick(mc.green),
   // Teal
-  [
-    colors.teal[100],
-    colors.teal[200],
-    colors.teal[300],
-    colors.teal[400],
-    colors.teal[500],
-    colors.teal[700],
-    colors.teal[900],
-  ],
+  pick(mc.teal),
   // Blue
-  [
-    colors.blue[100],
-    colors.blue[200],
-    colors.blue[300],
-    colors.blue[400],
-    colors.blue[500],
-    colors.blue[700],
-    colors.blue[900],
-  ],
-  // Violet
-  [
-    colors.violet[100],
-    colors.violet[200],
-    colors.violet[300],
-    colors.violet[400],
-    colors.violet[500],
-    colors.violet[700],
-    colors.violet[900],
-  ],
+  pick(mc.blue),
+  // Purple
+  pick(mc.purple),
   // Pink
-  [
-    colors.pink[100],
-    colors.pink[200],
-    colors.pink[300],
-    colors.pink[400],
-    colors.pink[500],
-    colors.pink[700],
-    colors.pink[900],
-  ],
+  pick(mc.pink),
 ];
 
 export const NUM_COLS = COLOR_COLUMNS.length;

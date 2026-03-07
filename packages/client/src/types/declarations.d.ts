@@ -24,3 +24,31 @@ declare module "*.css" {
   const content: Record<string, string>;
   export default content;
 }
+
+declare module "material-colors" {
+  type Shade = Record<string, string>;
+  const colors: {
+    red: Shade;
+    pink: Shade;
+    purple: Shade;
+    deepPurple: Shade;
+    indigo: Shade;
+    blue: Shade;
+    lightBlue: Shade;
+    cyan: Shade;
+    teal: Shade;
+    green: Shade;
+    lightGreen: Shade;
+    lime: Shade;
+    yellow: Shade;
+    amber: Shade;
+    orange: Shade;
+    deepOrange: Shade;
+    brown: Shade;
+    grey: Shade;
+    blueGrey: Shade;
+    white: string;
+    black: string;
+  };
+  export default colors;
+}

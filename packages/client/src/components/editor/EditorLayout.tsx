@@ -29,16 +29,29 @@ export function EditorLayout() {
 
   return (
     <div
-      className="flex flex-col h-screen overflow-hidden"
-      style={{ background: c.canvas, color: c.ink }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+        background: c.canvas,
+        color: c.ink,
+      }}
     >
       <TopNav />
-      <div className="flex flex-1 overflow-hidden">
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <Sidebar width={leftWidth} />
         <ResizeHandle side="right" onResize={onResizeLeft} />
         <main
-          className="flex flex-1 items-center justify-center overflow-hidden p-8"
-          style={{ position: "relative" }}
+          style={{
+            display: "flex",
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            padding: 32,
+            position: "relative",
+          }}
         >
           <SlideCanvas />
           <ToolBar />

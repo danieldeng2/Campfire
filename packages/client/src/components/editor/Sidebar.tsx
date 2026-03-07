@@ -54,8 +54,10 @@ export function Sidebar({ width }: SidebarProps) {
 
   return (
     <aside
-      className="flex flex-col shrink-0"
       style={{
+        display: "flex",
+        flexDirection: "column",
+        flexShrink: 0,
         width,
         background: c.surface,
         paddingTop: 8,
@@ -63,15 +65,26 @@ export function Sidebar({ width }: SidebarProps) {
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between shrink-0"
-        style={{ height: 32, paddingLeft: 16, paddingRight: 12 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexShrink: 0,
+          height: 32,
+          paddingLeft: 16,
+          paddingRight: 12,
+        }}
       >
         <span style={{ fontSize: 12, fontWeight: 700, color: ink(0.85) }}>Slides</span>
         <button
           onClick={handleAddSlide}
           title="New slide"
-          className="flex items-center justify-center rounded transition-colors"
           style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 4,
+            transition: "background 0.15s, color 0.15s",
             width: 22,
             height: 22,
             color: ink(1),
@@ -94,8 +107,19 @@ export function Sidebar({ width }: SidebarProps) {
 
       {/* Slide list */}
       <div
-        className="flex flex-col gap-4 py-4 scrollbar-track-transparent"
-        style={{ overflowY: "scroll", paddingLeft: 16, flex: 1, minHeight: 0, marginRight: 2 }}
+        className="sidebar-slide-list"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          paddingTop: 16,
+          paddingBottom: 16,
+          overflowY: "scroll",
+          paddingLeft: 16,
+          flex: 1,
+          minHeight: 0,
+          marginRight: 2,
+        }}
       >
         {slides.map((slide, index) => (
           <SlideThumbnail

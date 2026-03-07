@@ -30,19 +30,22 @@ export function TopNav() {
 
   return (
     <header
-      className="flex items-center justify-between px-4 shrink-0"
       style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingLeft: 16,
+        paddingRight: 16,
+        flexShrink: 0,
         height: 48,
         background: c.surface,
         borderBottom: `1px solid ${ink(0.1)}`,
       }}
     >
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5" style={{ cursor: "default" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "default" }}>
           <CampfireIcon />
-          <span className="text-sm font-semibold" style={{ color: c.ink }}>
-            Campfire
-          </span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: c.ink }}>Campfire</span>
         </div>
         <span style={{ color: ink(0.2) }}>/</span>
         {editing ? (
@@ -54,8 +57,8 @@ export function TopNav() {
               if (e.key === "Enter") commitEdit();
               if (e.key === "Escape") setEditing(false);
             }}
-            className="text-sm"
             style={{
+              fontSize: 14,
               color: ink(0.7),
               border: `1px solid ${ink(0.2)}`,
               borderRadius: 4,
@@ -69,8 +72,7 @@ export function TopNav() {
           />
         ) : (
           <span
-            className="text-sm"
-            style={{ color: ink(0.45), cursor: "text" }}
+            style={{ fontSize: 14, color: ink(0.45), cursor: "text" }}
             onClick={startEdit}
             title="Click to rename"
           >
@@ -84,8 +86,16 @@ export function TopNav() {
           const idx = slides.findIndex((s) => s.id === activeSlideId);
           router.push(`/present${idx > 0 ? `?slide=${idx}` : ""}`);
         }}
-        className="flex items-center gap-2 text-sm font-semibold px-4 rounded-md transition-all"
         style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          paddingLeft: 16,
+          paddingRight: 16,
+          borderRadius: 6,
+          transition: "background 0.15s",
           height: 32,
           background: c.brand,
           color: "#ffffff",
