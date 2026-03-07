@@ -3,6 +3,7 @@
 import { useCallback, useRef } from "react";
 import type { SlideRect } from "@/types/slides";
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
+import { resolveSnap } from "@/lib/snap";
 
 export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 
@@ -100,10 +101,19 @@ interface UseResizeElementOptions {
   rect: SlideRect;
   scale: number;
   onResize: (newRect: SlideRect) => void;
+  onSnapChange: (snap: { vertical: number[]; horizontal: number[] }) => void;
+  getSiblingRects: () => SlideRect[];
   aspectRatio?: number;
 }
 
-export function useResizeElement({ rect, scale, onResize, aspectRatio }: UseResizeElementOptions) {
+export function useResizeElement({
+  rect,
+  scale,
+  onResize,
+  onSnapChange,
+  getSiblingRects,
+  aspectRatio,
+}: UseResizeElementOptions) {
   const activeHandle = useRef<ResizeHandle | null>(null);
   const startPointer = useRef({ x: 0, y: 0 });
   const startRect = useRef<SlideRect>(rect);
@@ -132,16 +142,76 @@ export function useResizeElement({ rect, scale, onResize, aspectRatio }: UseResi
         dy,
         aspectRatio
       );
+
+      const handle = activeHandle.current;
+
+      // Only snap the edges that are actively being resized
+      const movingXEdges: number[] = [];
+      if (handle.includes("w")) movingXEdges.push(newRect.x);
+      if (handle.includes("e")) movingXEdges.push(newRect.x + newRect.width);
+
+      const movingYEdges: number[] = [];
+      if (handle.includes("n")) movingYEdges.push(newRect.y);
+      if (handle.includes("s")) movingYEdges.push(newRect.y + newRect.height);
+
+      const { snapX, snapY } = resolveSnap(
+        movingXEdges,
+        movingYEdges,
+        getSiblingRects(),
+        newRect.x + newRect.width / 2,
+        newRect.y + newRect.height / 2
+      );
+
+      // Apply snap deltas by adjusting the appropriate edges
+      if (snapX) {
+        const snapDx = snapX.position;
+        if (handle.includes("w")) {
+          newRect.x += snapDx;
+          newRect.width -= snapDx;
+        } else if (handle.includes("e")) {
+          newRect.width += snapDx;
+        }
+        if (aspectRatio && CORNER_HANDLES.has(handle)) {
+          newRect.height = newRect.width / aspectRatio;
+          if (handle.includes("n")) {
+            newRect.y = startRect.current.y + startRect.current.height - newRect.height;
+          }
+        }
+      }
+      if (snapY) {
+        const snapDy = snapY.position;
+        if (handle.includes("n")) {
+          newRect.y += snapDy;
+          newRect.height -= snapDy;
+        } else if (handle.includes("s")) {
+          newRect.height += snapDy;
+        }
+        if (aspectRatio && CORNER_HANDLES.has(handle)) {
+          newRect.width = newRect.height * aspectRatio;
+          if (handle.includes("w")) {
+            newRect.x = startRect.current.x + startRect.current.width - newRect.width;
+          }
+        }
+      }
+
+      onSnapChange({
+        vertical: snapX?.linePositions ?? [],
+        horizontal: snapY?.linePositions ?? [],
+      });
       onResize(newRect);
     },
-    [scale, onResize]
+    [scale, onResize, onSnapChange, getSiblingRects, aspectRatio]
   );
 
-  const onPointerUp = useCallback((e: React.PointerEvent<HTMLElement>) => {
-    if (!activeHandle.current) return;
-    activeHandle.current = null;
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-  }, []);
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      if (!activeHandle.current) return;
+      activeHandle.current = null;
+      onSnapChange({ vertical: [], horizontal: [] });
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    },
+    [onSnapChange]
+  );
 
   return { getHandlePointerDown, onPointerMove, onPointerUp };
 }

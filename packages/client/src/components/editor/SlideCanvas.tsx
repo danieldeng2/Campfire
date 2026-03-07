@@ -169,7 +169,7 @@ export function SlideCanvas() {
             />
           )}
 
-          <SnapLines showV={snapLines.showV} showH={snapLines.showH} />
+          <SnapLines vertical={snapLines.vertical} horizontal={snapLines.horizontal} />
           <RubberBand rect={bandRect} />
         </ScaledCanvas>
       </div>

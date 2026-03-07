@@ -1,17 +1,17 @@
 "use client";
 
 import { useCallback, useRef } from "react";
-import { SlideRect } from "@/types/slides";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_CX, CANVAS_CY } from "@/lib/canvasConstants";
-
-const SNAP_THRESHOLD = 10;
+import type { SlideRect } from "@/types/slides";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
+import { resolveSnap } from "@/lib/snap";
 
 interface UseDragElementOptions {
   rect: SlideRect;
   scale: number;
   onDragEnd: (newRect: SlideRect) => void;
-  onSnapChange: (snap: { showH: boolean; showV: boolean }) => void;
+  onSnapChange: (snap: { vertical: number[]; horizontal: number[] }) => void;
   enabled: boolean;
+  getSiblingRects: () => SlideRect[];
 }
 
 export function useDragElement({
@@ -20,6 +20,7 @@ export function useDragElement({
   onDragEnd,
   onSnapChange,
   enabled,
+  getSiblingRects,
 }: UseDragElementOptions) {
   const isDragging = useRef(false);
   const didDrag = useRef(false);
@@ -57,24 +58,31 @@ export function useDragElement({
       const clampedX = Math.max(0, Math.min(CANVAS_WIDTH - rect.width, newX));
       const clampedY = Math.max(0, Math.min(CANVAS_HEIGHT - rect.height, newY));
 
-      const elCX = clampedX + rect.width / 2;
-      const elCY = clampedY + rect.height / 2;
-      const nearV = Math.abs(elCX - CANVAS_CX) < SNAP_THRESHOLD;
-      const nearH = Math.abs(elCY - CANVAS_CY) < SNAP_THRESHOLD;
-      const snappedX = nearV ? CANVAS_CX - rect.width / 2 : clampedX;
-      const snappedY = nearH ? CANVAS_CY - rect.height / 2 : clampedY;
+      const { snapX, snapY } = resolveSnap(
+        [clampedX, clampedX + rect.width],
+        [clampedY, clampedY + rect.height],
+        getSiblingRects(),
+        clampedX + rect.width / 2,
+        clampedY + rect.height / 2
+      );
 
-      onSnapChange({ showH: nearH, showV: nearV });
+      const snappedX = snapX ? clampedX + snapX.position : clampedX;
+      const snappedY = snapY ? clampedY + snapY.position : clampedY;
+
+      onSnapChange({
+        vertical: snapX?.linePositions ?? [],
+        horizontal: snapY?.linePositions ?? [],
+      });
       onDragEnd({ ...startRect.current, x: snappedX, y: snappedY });
     },
-    [scale, rect.width, rect.height, onDragEnd, onSnapChange]
+    [scale, rect.width, rect.height, onDragEnd, onSnapChange, getSiblingRects]
   );
 
   const onPointerUp = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
       if (!isDragging.current) return;
       isDragging.current = false;
-      onSnapChange({ showH: false, showV: false });
+      onSnapChange({ vertical: [], horizontal: [] });
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     },
     [onSnapChange]

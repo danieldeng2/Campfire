@@ -38,9 +38,15 @@ export function TextElement({ element, slideId, scale }: Props) {
   } = useEditorStore();
 
   const onSnapChange = useCallback(
-    (snap: { showH: boolean; showV: boolean }) => setSnapLines(snap),
+    (snap: { vertical: number[]; horizontal: number[] }) => setSnapLines(snap),
     [setSnapLines]
   );
+
+  const getSiblingRects = useCallback(() => {
+    const slide = useSlidesStore.getState().deck.slides.find((sl) => sl.id === slideId);
+    return slide?.elements.filter((el) => el.id !== id).map((el) => el.rect) ?? [];
+  }, [slideId, id]);
+
   const {
     updateElementRect,
     updateElementContent,
@@ -79,6 +85,7 @@ export function TextElement({ element, slideId, scale }: Props) {
     onDragEnd: (newRect) => updateElementRect(slideId, id, newRect),
     onSnapChange,
     enabled: !isEditing,
+    getSiblingRects,
   });
 
   const {
@@ -89,6 +96,8 @@ export function TextElement({ element, slideId, scale }: Props) {
     rect,
     scale,
     onResize: (newRect) => updateElementRect(slideId, id, newRect),
+    onSnapChange,
+    getSiblingRects,
   });
 
   // Register a flush callback so sidebar/keyboard handlers can save live DOM content

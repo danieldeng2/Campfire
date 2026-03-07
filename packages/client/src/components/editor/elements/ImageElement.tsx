@@ -29,9 +29,14 @@ export function ImageElement({ element, slideId, scale }: Props) {
   const isSelected = selectedElementIds.includes(id);
   const aspectRatio = rect.width / rect.height;
 
-  const onSnapChange = useCallback((snap: { showH: boolean; showV: boolean }) => {
+  const onSnapChange = useCallback((snap: { vertical: number[]; horizontal: number[] }) => {
     useEditorStore.getState().setSnapLines(snap);
   }, []);
+
+  const getSiblingRects = useCallback(() => {
+    const slide = useSlidesStore.getState().deck.slides.find((sl) => sl.id === slideId);
+    return slide?.elements.filter((el) => el.id !== id).map((el) => el.rect) ?? [];
+  }, [slideId, id]);
 
   const { onPointerDown, onPointerMove, onPointerUp, didDrag, clearDidDrag } = useDragElement({
     rect,
@@ -39,6 +44,7 @@ export function ImageElement({ element, slideId, scale }: Props) {
     onDragEnd: (newRect) => updateElementRect(slideId, id, newRect),
     onSnapChange,
     enabled: true,
+    getSiblingRects,
   });
 
   const {
@@ -49,6 +55,8 @@ export function ImageElement({ element, slideId, scale }: Props) {
     rect,
     scale,
     onResize: (newRect) => updateElementRect(slideId, id, newRect),
+    onSnapChange,
+    getSiblingRects,
     aspectRatio,
   });
 

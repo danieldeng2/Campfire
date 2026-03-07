@@ -1,21 +1,22 @@
 "use client";
 
 import { c } from "@/lib/colors";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_CX, CANVAS_CY } from "@/lib/canvasConstants";
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 
 interface SnapLinesProps {
-  showV: boolean;
-  showH: boolean;
+  vertical: number[];
+  horizontal: number[];
 }
 
-export function SnapLines({ showV, showH }: SnapLinesProps) {
+export function SnapLines({ vertical, horizontal }: SnapLinesProps) {
   return (
     <>
-      {showV && (
+      {vertical.map((x, i) => (
         <div
+          key={`v${i}`}
           style={{
             position: "absolute",
-            left: CANVAS_CX - 1,
+            left: x - 1,
             top: 0,
             width: 2,
             height: CANVAS_HEIGHT,
@@ -23,20 +24,21 @@ export function SnapLines({ showV, showH }: SnapLinesProps) {
             pointerEvents: "none",
           }}
         />
-      )}
-      {showH && (
+      ))}
+      {horizontal.map((y, i) => (
         <div
+          key={`h${i}`}
           style={{
             position: "absolute",
             left: 0,
-            top: CANVAS_CY - 1,
+            top: y - 1,
             width: CANVAS_WIDTH,
             height: 2,
             backgroundColor: c.danger,
             pointerEvents: "none",
           }}
         />
-      )}
+      ))}
     </>
   );
 }

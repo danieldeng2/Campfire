@@ -100,7 +100,7 @@ export const HARDCODED_DECK: Deck = {
           zIndex: 3,
           src: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Campfire_Pinecone.png",
           objectFit: "cover",
-          borderRadius: 16,
+          borderRadius: 64,
         },
       ],
     },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSlidesStore } from "@/store/slidesStore";
 import { useEditorStore } from "@/store/editorStore";
@@ -10,6 +10,14 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import "reveal.js/dist/reveal.css";
 
 export default function PresentPage() {
+  return (
+    <Suspense>
+      <PresentPageInner />
+    </Suspense>
+  );
+}
+
+function PresentPageInner() {
   const deckRef = useRef<HTMLDivElement>(null);
   const slides = useSlidesStore((s) => s.deck.slides);
   const setActiveSlide = useEditorStore((s) => s.setActiveSlide);

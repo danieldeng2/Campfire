@@ -7,7 +7,7 @@ interface EditorState {
   editingElementId: string | null;
   activeTool: Tool;
   selectionRange: { start: number; end: number } | null;
-  snapLines: { showH: boolean; showV: boolean };
+  snapLines: { vertical: number[]; horizontal: number[] };
   /** Flushes unsaved DOM content to the store. Registered by TextElement while editing. */
   flushEditingContent: (() => void) | null;
   /** Image waiting to be placed on the canvas. */
@@ -17,7 +17,7 @@ interface EditorState {
   setEditingElement: (id: string | null) => void;
   setActiveTool: (tool: Tool) => void;
   setSelectionRange: (range: { start: number; end: number } | null) => void;
-  setSnapLines: (snap: { showH: boolean; showV: boolean }) => void;
+  setSnapLines: (snap: { vertical: number[]; horizontal: number[] }) => void;
   setFlushEditingContent: (fn: (() => void) | null) => void;
   setPendingImage: (img: { src: string; width: number; height: number } | null) => void;
 }
@@ -28,7 +28,7 @@ export const useEditorStore = create<EditorState>()((set) => ({
   editingElementId: null,
   activeTool: Tool.Move,
   selectionRange: null,
-  snapLines: { showH: false, showV: false },
+  snapLines: { vertical: [], horizontal: [] },
   flushEditingContent: null,
   setActiveSlide: (id) =>
     set({
