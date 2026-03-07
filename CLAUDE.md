@@ -8,14 +8,14 @@
 
 ## Workflow
 
-- **After editing any file**: run `source ~/.zprofile && pnpm prettier --write <file>` before moving on.
+- **After editing any file**: run `pnpm prettier --write <file>` before moving on.
 - **Before committing**: update `README.md` to reflect any relevant changes (new commands, changed structure, new features).
 
 ## Repository
 
 - **Package manager**: pnpm monorepo. Run all commands from the repo root.
 - **Frontend**: `packages/client` (`@campfire/client`). `pnpm dev` / `pnpm build` delegate to it via `--filter`.
-- **Shell**: prepend `source ~/.zprofile &&` to any `node`/`pnpm` commands — the shell PATH doesn't include `/opt/homebrew/bin` by default.
+- **Shell**: PATH is configured via `~/.zshenv` — no special prefix needed for `node`/`pnpm` commands.
 
 ## Colors
 
