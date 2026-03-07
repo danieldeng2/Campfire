@@ -50,7 +50,7 @@ export function Sidebar({ width }: SidebarProps) {
     }
   };
 
-  const thumbnailWidth = width - SIDEBAR_PADDING - 18;
+  const thumbnailWidth = width - SIDEBAR_PADDING * 2;
 
   return (
     <aside
@@ -71,8 +71,8 @@ export function Sidebar({ width }: SidebarProps) {
           justifyContent: "space-between",
           flexShrink: 0,
           height: 32,
-          paddingLeft: 16,
-          paddingRight: 12,
+          paddingLeft: SIDEBAR_PADDING,
+          paddingRight: SIDEBAR_PADDING,
         }}
       >
         <span style={{ fontSize: 12, fontWeight: 700, color: ink(0.85) }}>Slides</span>
@@ -85,8 +85,7 @@ export function Sidebar({ width }: SidebarProps) {
             justifyContent: "center",
             borderRadius: 4,
             transition: "background 0.15s, color 0.15s",
-            width: 22,
-            height: 22,
+            padding: 2,
             color: ink(1),
             background: "transparent",
             border: "none",
@@ -101,7 +100,7 @@ export function Sidebar({ width }: SidebarProps) {
             (e.currentTarget as HTMLButtonElement).style.color = ink(1);
           }}
         >
-          <Plus size={14} strokeWidth={1.5} />
+          <Plus size={18} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -111,13 +110,15 @@ export function Sidebar({ width }: SidebarProps) {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 16,
-          paddingTop: 16,
-          paddingBottom: 16,
+          gap: 10,
+          paddingTop: 10,
+          paddingBottom: 10,
           overflowY: "scroll",
-          paddingLeft: 16,
+          paddingLeft: SIDEBAR_PADDING,
+          paddingRight: SIDEBAR_PADDING,
           flex: 1,
           minHeight: 0,
+          // Gap for the scrolling track
           marginRight: 2,
         }}
       >

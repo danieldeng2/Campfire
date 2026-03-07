@@ -6,7 +6,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from "@/lib/canvasConstants";
 import { DropIndicator } from "./DragDrop";
 import { ScaledCanvas } from "./ScaledCanvas";
 
-export const SIDEBAR_PADDING = 16;
+export const SIDEBAR_PADDING = 14;
 
 interface Props {
   slide: Slide;
