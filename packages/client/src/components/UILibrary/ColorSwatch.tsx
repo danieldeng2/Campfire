@@ -41,7 +41,7 @@ export function ColorSwatch({ value, onChange, label }: Props) {
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <style>{SPIN_HIDE}</style>
       {label && (
-        <span style={{ fontSize: 11, color: ink(0.85), fontWeight: 600, lineHeight: 1 }}>
+        <span style={{ fontSize: 10, color: ink(0.6), fontWeight: 500, lineHeight: 1 }}>
           {label}
         </span>
       )}

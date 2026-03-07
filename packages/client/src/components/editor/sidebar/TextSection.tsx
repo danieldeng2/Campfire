@@ -112,7 +112,7 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
       {/* Style + Align row */}
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={{ fontSize: 11, color: ink(0.85), fontWeight: 600, lineHeight: 1 }}>
+          <span style={{ fontSize: 10, color: ink(0.6), fontWeight: 500, lineHeight: 1 }}>
             Style
           </span>
           <div style={{ display: "flex", gap: 4 }}>
@@ -145,7 +145,7 @@ export function TextSection({ elements, resolvedStyles, activeSlideId }: Props) 
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={{ fontSize: 11, color: ink(0.85), fontWeight: 600, lineHeight: 1 }}>
+          <span style={{ fontSize: 10, color: ink(0.6), fontWeight: 500, lineHeight: 1 }}>
             Align
           </span>
           <div style={{ display: "flex", gap: 4 }}>

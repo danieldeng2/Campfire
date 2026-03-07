@@ -30,9 +30,9 @@ export function SelectInput<T extends string | number>({
     <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
       <span
         style={{
-          fontSize: 11,
-          color: ink(0.85),
-          fontWeight: 600,
+          fontSize: 10,
+          color: ink(0.6),
+          fontWeight: 500,
           lineHeight: 1,
         }}
       >
